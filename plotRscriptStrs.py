@@ -34,12 +34,12 @@ plotReadsCorrectedEvalStr = '''
     }
 '''
 
-plotAllelicAsStructureStr = '''
+plotAlleleAsStructureStr = '''
     library(rtracklayer)
     library(GenomicFeatures)
     library(Gviz)
 
-    plotAllelicAsStructure <- function(refGenome, gtfs, mixedBam, haploBams, ngsBam, chrom, chromStart, chromEnd, htStarts, htEnds, color, outName){
+    plotAlleleAsStructure <- function(refGenome, gtfs, mixedBam, haploBams, ngsBam, chrom, chromStart, chromEnd, htStarts, htEnds, color, outName){
         options(ucscChromosomeNames=FALSE)
         pdf(paste0(outName, ".pdf"), height=15)
         gtrack <- GenomeAxisTrack(cex = 1)

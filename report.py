@@ -215,25 +215,25 @@ def reportNovelHqAS(dataObj=None, dirSpec=None):
     print getCurrentTime() + " Plotting Novel High-quality Isoform scores for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
     return ["isoformScore.pdf"]
 
-def reportAllelicAS(dataObj=None, refParams=None, dirSpec=None):
-    print getCurrentTime() + " Start plotting Allelic-Specific AS for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
+def reportAlleleAS(dataObj=None, refParams=None, dirSpec=None):
+    print getCurrentTime() + " Start plotting Allele-Specific AS for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
     baseDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name)
-    asHaploFile = os.path.join(baseDir, "allelicAS", "partialAsRelatedHaplotype.txt")
+    asHaploFile = os.path.join(baseDir, "alleleAS", "partialAsRelatedHaplotype.txt")
     if not validateFile(asHaploFile):
-        print getCurrentTime() + " No Allelic-Specific AS available for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
+        print getCurrentTime() + " No Allele-Specific AS available for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
         return
     asHaplo = pd.read_csv(asHaploFile, header=None, sep="\t", names=["gene", "asType", "haplo1", "haplo1isos", "haplo2", "haplo2isos"])
     asHaplo = asHaplo.loc[:, ["gene", "haplo1", "haplo1isos", "haplo2", "haplo2isos"]].drop_duplicates()
-    allelicAsDir = os.path.join(os.getcwd(), "allelicAsPlots")
-    resolveDir(allelicAsDir)
+    alleleAsDir = os.path.join(os.getcwd(), "alleleAsPlots")
+    resolveDir(alleleAsDir)
     isoformFile = os.path.join(baseDir, "collapse", "isoformGrouped.bed12+")
     collapsedGroupFile = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
     flncBam = os.path.join(baseDir, "mapping", "flnc.mm2.sorted.bam")
     isoBedObj = BedFile(isoformFile, type="bed12+")
     collapsedTrans2reads = getDictFromFile(collapsedGroupFile, sep="\t", inlineSep=",", valueCol=2)
-    allelicAsPdfs = []
+    alleleAsPdfs = []
     for i, row in asHaplo.iterrows():
-        outName = "{}.allelic_as".format(row.gene)
+        outName = "{}.allele_as".format(row.gene)
         resolveDir(outName)
         haplo1isosOut = open("haplo1isosOut.bed", "w")
         haplo2isosOut = open("haplo2isosOut.bed", "w")
@@ -281,43 +281,43 @@ def reportAllelicAS(dataObj=None, refParams=None, dirSpec=None):
             subprocess.call(cmd, shell=True, executable="/bin/bash")
             targetNgsBam = os.path.join(os.getcwd(), "ngsReads.sorted.bam")
 
-        from plotRscriptStrs import plotAllelicAsStructureStr
-        robjects.r(plotAllelicAsStructureStr)
-        robjects.r.plotAllelicAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0], min(chromStarts), max(chromEnds), outName)
-        allelicAsPdfs.append(os.path.join("{}.pdf".format(outName)))
-        os.chdir(allelicAsDir)
+        from plotRscriptStrs import plotAlleleAsStructureStr
+        robjects.r(plotAlleleAsStructureStr)
+        robjects.r.plotAlleleAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0], min(chromStarts), max(chromEnds), outName)
+        alleleAsPdfs.append(os.path.join("{}.pdf".format(outName)))
+        os.chdir(alleleAsDir)
 
     writer = PyPDF2.PdfFileWriter()
-    for i in allelicAsPdfs:
+    for i in alleleAsPdfs:
         pdf = PyPDF2.PdfFileReader(open(i, "rb"))
         for page in range(pdf.getNumPages()):
             writer.addPage(pdf.getPage(page))
-    output = open("allelicAS.pdf", "wb")
+    output = open("alleleAS.pdf", "wb")
     writer.write(output)
     output.close()
     print getCurrentTime() + " Plotting Allelic-Specific AS for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
 
-def reportAllelicAS1(dataObj=None, refParams=None, dirSpec=None):
-    print getCurrentTime() + " Start plotting Allelic-Specific AS for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
+def reportAlleleAS1(dataObj=None, refParams=None, dirSpec=None):
+    print getCurrentTime() + " Start plotting Allele-Specific AS for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
     baseDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name)
-    asHaploFile = os.path.join(baseDir, "allelicAS", "partialAsRelatedHaplotype.txt")
+    asHaploFile = os.path.join(baseDir, "alleleAS", "partialAsRelatedHaplotype.txt")
     if not validateFile(asHaploFile):
-        print getCurrentTime() + " No Allelic-Specific AS available for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
+        print getCurrentTime() + " No Allele-Specific AS available for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
         return
     asHaplo = pd.read_csv(asHaploFile, header=None, sep="\t", names=["gene", "asType", "refGene", "asEvent", "haplo1", "haplo1isos", "haplo2", "haplo2isos"])
     # asHaplo = asHaplo.loc[:, ["gene", "haplo1", "haplo1isos", "haplo2", "haplo2isos"]].drop_duplicates()
-    allelicAsDir = os.path.join(os.getcwd(), "allelicAsPlots")
-    resolveDir(allelicAsDir)
+    alleleAsDir = os.path.join(os.getcwd(), "alleleAsPlots")
+    resolveDir(alleleAsDir)
     isoformFile = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
     collapsedGroupFile = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
     flncBam = os.path.join(baseDir, "mapping", "flnc.mm2.sorted.bam")
     isoBedObj = BedFile(isoformFile, type="bed12+")
     collapsedTrans2reads = getDictFromFile(collapsedGroupFile, sep="\t", inlineSep=",", valueCol=2)
-    allelicAsPdfs = []
+    alleleAsPdfs = []
     highlightColorDict = {"IR": "#0000FF", "SE": "#00EE00", "A3SS": "#FFA500", "A5SS": "#DD77FF"}
     runParams = []
     for name, group in asHaplo.groupby(["gene", "refGene", "asType"]):
-        outName = "{}.{}.allelic_as".format(name[1], name[2])
+        outName = "{}.{}.allele_as".format(name[1], name[2])
         resolveDir(outName)
         haplo1isosOut = open("haplo1isosOut.bed", "w")
         haplo2isosOut = open("haplo2isosOut.bed", "w")
@@ -388,28 +388,28 @@ def reportAllelicAS1(dataObj=None, refParams=None, dirSpec=None):
 
         params = [refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0], min(chromStarts), max(chromEnds),
                   ",".join(map(str, highlightStarts)), ",".join(map(str, highlightEnds)), highlightColorDict[name[2]],
-                  outName, allelicAsDir]
+                  outName, alleleAsDir]
         runParams.append(params)
 
-        # robjects.r.plotAllelicAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0],
+        # robjects.r.plotAlleleAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0],
         #                                   min(chromStarts), max(chromEnds), ",".join(map(str, highlightStarts)),
         #                                   ",".join(map(str, highlightEnds)), highlightColorDict[name[1]], outName)
-        # allelicAsPdfs.append(os.path.join("{}.pdf".format(outName)))
-        os.chdir(allelicAsDir)
+        # alleleAsPdfs.append(os.path.join("{}.pdf".format(outName)))
+        os.chdir(alleleAsDir)
 
-    from plotRscriptStrs import plotAllelicAsStructureStr
-    robjects.r(plotAllelicAsStructureStr)
+    from plotRscriptStrs import plotAlleleAsStructureStr
+    robjects.r(plotAlleleAsStructureStr)
     pool = Pool(processes=dataObj.single_run_threads)
     for params in runParams:
-        pool.apply_async(robjects.r.plotAllelicAsStructure, (params[0], params[1], params[2], params[3], params[4],
+        pool.apply_async(robjects.r.plotAlleleAsStructure, (params[0], params[1], params[2], params[3], params[4],
                                                              params[5], params[6], params[7], params[8], params[9],
                                                              params[10], os.path.join(params[12], params[11])))
-        allelicAsPdfs.append(os.path.join(params[12], "{}.pdf".format(params[11])))
+        alleleAsPdfs.append(os.path.join(params[12], "{}.pdf".format(params[11])))
     pool.close()
     pool.join()
 
     # for i, row in asHaplo.iterrows():
-    #     outName = "{}.allelic_as".format(row.gene)
+    #     outName = "{}.allele_as".format(row.gene)
     #     resolveDir(outName)
     #     haplo1isosOut = open("haplo1isosOut.bed", "w")
     #     haplo2isosOut = open("haplo2isosOut.bed", "w")
@@ -464,14 +464,14 @@ def reportAllelicAS1(dataObj=None, refParams=None, dirSpec=None):
     #     os.chdir(allelicAsDir)
 
     writer = PyPDF2.PdfFileWriter()
-    for i in allelicAsPdfs:
+    for i in alleleAsPdfs:
         pdf = PyPDF2.PdfFileReader(open(i, "rb"))
         for page in range(pdf.getNumPages()):
             writer.addPage(pdf.getPage(page))
-    output = open("allelicAS.pdf", "wb")
+    output = open("alleleAS.pdf", "wb")
     writer.write(output)
     output.close()
-    print getCurrentTime() + " Plotting Allelic-Specific AS for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
+    print getCurrentTime() + " Plotting Allele-Specific AS for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
 
 def reportPaTailAS(dataObj=None, dirSpec=None):
     print getCurrentTime() + " Start plotting Differential Poly(A) tail length related AS for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
@@ -560,7 +560,7 @@ def report(dataToProcess=None, refInfoParams=None, dirSpec=None, optionTools=Non
         # if args.novelIso or args.all:
         #     plots2merge.extend(reportNovelHqAS(dataObj=dataObj, dirSpec=dirSpec))
         if args.asas or args.all:
-            reportAllelicAS1(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
+            reportAlleleAS1(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
             os.chdir(subDir)
         if args.palen or args.all:
             reportPaTailAS(dataObj=dataObj, dirSpec=dirSpec)

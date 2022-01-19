@@ -71,7 +71,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                         from rank_as import rank_as
                         # rank_as(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
                         pool.apply_async(rank_as, (dataObj, dirSpec, refParams))
-                    if args.command == 'allelic_as':
+                    if args.command == 'allele_as':
                         from allele_as import allele_as
                         allele_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, args=args)
                         # pool.apply_async(allele_as, (dataObj, refParams, dirSpec, args))
@@ -136,10 +136,10 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                 from rank_as import rank_as
                 # rank_as(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
                 pool.apply_async(rank_as, (dataObj, dirSpec, refParams))
-            if args.command == 'allelic_as':
+            if args.command == 'allele_as':
                 from allele_as import allele_as
                 allele_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, args=args)
-                # pool.apply_async(allelic, (dataObj, refParams, dirSpec, args))
+                # pool.apply_async(allele_as, (dataObj, refParams, dirSpec, args))
             if args.command == 'palen_as':
                 from palen_as import palen_as
                 palen_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, filterByCount=args.pa_support, dataToProcess=dataToProcess, confidentPac=args.confidentPac)
@@ -222,12 +222,12 @@ if __name__ == "__main__":
     parser_rankAS = subparsers.add_parser('rank_as', help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
     parser_rankAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
 
-    parser_allelicAS = subparsers.add_parser('allelic_as', help='Identify allelic-related AS', usage='%(prog)s [options]')
-    parser_allelicAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
-    parser_allelicAS.add_argument('-ase', dest="ase", action="store_true", default=False, help="Whether to Carry out ASE analysis.")
-    parser_allelicAS.add_argument('-ref_fa', dest="refFa", default=None, help="The reference fasta file used to be quantified in ASE.")
-    parser_allelicAS.add_argument('-alt_fa', dest="altFa", default=None, help="The alternative fasta file used to be quantified in ASE.")
-    parser_allelicAS.add_argument('-fbs', dest="useFreebayes", action="store_true", default=False, help="Call the heterozygosity SNPs with freebayes in ASE.")
+    parser_alleleAS = subparsers.add_parser('allele_as', help='Identify allele-related AS', usage='%(prog)s [options]')
+    parser_alleleAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_alleleAS.add_argument('-ase', dest="ase", action="store_true", default=False, help="Whether to Carry out ASE analysis.")
+    parser_alleleAS.add_argument('-ref_fa', dest="refFa", default=None, help="The reference fasta file used to be quantified in ASE.")
+    parser_alleleAS.add_argument('-alt_fa', dest="altFa", default=None, help="The alternative fasta file used to be quantified in ASE.")
+    parser_alleleAS.add_argument('-fbs', dest="useFreebayes", action="store_true", default=False, help="Call the heterozygosity SNPs with freebayes in ASE.")
 
     parser_palenAS = subparsers.add_parser('palen_as', help='Identify functional poly(A) tail length related to AS', usage='%(prog)s [options]')
     parser_palenAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")

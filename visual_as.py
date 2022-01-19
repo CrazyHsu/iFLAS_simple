@@ -210,7 +210,6 @@ def visual_as_merge(dataToProcess=None, targetGenes=None, refParams=None, dirSpe
                 isoformGff = os.path.abspath(os.path.join(tmpDir, "{}.iFLAS.gff".format(geneName)))
                 isoformGpe = os.path.abspath(os.path.join(tmpDir, "{}.iFLAS.gpe".format(geneName)))
                 ngsSamList = glob.glob(os.path.join(tmpDir, "repeat*.{}.sam".format(geneName)))
-                ngsDepthList = glob.glob(os.path.join(tmpDir, "repeat*.{}.depth".format(geneName)))
                 if validateFile(isoformGff):
                     tmpDict["tgs"] = [isoformGff, isoformGpe]
                 for i in range(len(ngsSamList)):
@@ -281,8 +280,8 @@ def visual_as_merge(dataToProcess=None, targetGenes=None, refParams=None, dirSpe
                     sectionToPlot.append(depthPlot)
                     ngsSam = tmpSample["ngs"][repeatName][0]
                     ngsPlot = PlotSection(section_name="[Reads_{}_{}]".format(repeatName, sampleName), plot_type="read_depth",
-                                            source_file=ngsSam, relative_size=5.0,
-                                            title_string="{} Read Coverage in {} {}".format(geneName, sampleName, repeatName))
+                                          source_file=ngsSam, relative_size=5.0,
+                                          title_string="{} Read Coverage in {} {}".format(geneName, sampleName, repeatName))
                     sectionToPlot.append(ngsPlot)
             figOut = geneName + ".pdf"
             cfgOut = open(geneName + ".cfg", "w")
@@ -312,7 +311,6 @@ def visual_as(dataObj=None, targetGenes=None, refParams=None, dirSpec=None):
     baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
     gpeObj = GenePredObj(refParams.ref_gpe, False)
     resolveDir(os.path.join(baseDir, "isoViewer"))
-    # tgsIsoFile = os.path.join(baseDir, "as_events", "ordinary_as", "isoformGrouped.AS.confident.bed12+")
     tgsIsoFile = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
     readsDict = {}
     selectedGenes = {}

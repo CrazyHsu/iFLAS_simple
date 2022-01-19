@@ -140,7 +140,6 @@ def relationshipBetweenAlleleSpecifiAndAS(partial=False, nopartial=False, isoPai
             partialHaplotype = "phased.partial.cleaned.human_readable.txt"
             if os.path.exists(partialHaplotype):
                 partialDF = pd.read_csv(partialHaplotype, skiprows=[0], index_col=0, sep="\t")
-                # if not set(isoPair[0] + isoPair[1]).issubset(set(partialDF.columns)): continue
                 newIncIsos = list(set(partialDF.columns) & set(isoPair[0]))
                 newExcIsos = list(set(partialDF.columns) & set(isoPair[1]))
                 if len(newIncIsos) == 0 or len(newExcIsos) == 0: continue
@@ -186,10 +185,10 @@ def relationshipBetweenAlleleSpecifiAndAS(partial=False, nopartial=False, isoPai
 
 def allele_as(dataObj=None, refParams=None, dirSpec=None, args=None):
     projectName, sampleName = dataObj.project_name, dataObj.sample_name
-    print getCurrentTime() + " Identify allelic-specific AS events for project {} sample {}...".format(projectName, sampleName)
+    print getCurrentTime() + " Identify allele-specific AS events for project {} sample {}...".format(projectName, sampleName)
     prevDir = os.getcwd()
     baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
-    resolveDir(os.path.join(baseDir, "allelicAS"))
+    resolveDir(os.path.join(baseDir, "alleleAS"))
 
     collapsedGroupFile = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
     readStatFile = "tofu.collapsed.read_stat.txt"
@@ -220,11 +219,9 @@ def allele_as(dataObj=None, refParams=None, dirSpec=None, args=None):
     subprocess.call(cmd, shell=True)
 
     lociDir = glob.glob("by_loci/*size*")
-    # multiResults = []
     pool = Pool(processes=dataObj.single_run_threads)
     for i in lociDir:
         pool.apply_async(runPhaser, (i,))
-        # multiResults.append(singleRunRes)
     pool.close()
     pool.join()
 
@@ -244,7 +241,6 @@ def allele_as(dataObj=None, refParams=None, dirSpec=None, args=None):
 
     '''the structure of resultDict is resultDict = {fakeGene: {asType: {partialCategory: {asEvent: {haplotype1: PB.X.1, haplotype2: PB.X.2, ...}}}}}'''
     partialOut = open("partialAsRelatedHaplotype.txt", "w")
-    # nopartialOut = open("nopartialAsRelatedHaplotype.txt", "w")
     for gene in resultDict:
         for asType in resultDict[gene]:
             for partial in resultDict[gene][asType]:
@@ -255,4 +251,4 @@ def allele_as(dataObj=None, refParams=None, dirSpec=None, args=None):
                     print >>partialOut, "\t".join([gene, asType, refGene, asEvent, haplotype1, haplos[haplotype1], haplotype2, haplos[haplotype2]])
     partialOut.close()
     os.chdir(prevDir)
-    print getCurrentTime() + " Identify allelic-specific AS events for project {} sample {} done!".format(projectName, sampleName)
+    print getCurrentTime() + " Identify allele-specific AS events for project {} sample {} done!".format(projectName, sampleName)
