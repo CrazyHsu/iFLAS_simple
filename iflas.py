@@ -255,7 +255,7 @@ if __name__ == "__main__":
     parser_report.add_argument('-asas', dest="asas", action="store_true", default=False, help="Generate allele-specific AS events.")
     parser_report.add_argument('-palen', dest="palen", action="store_true", default=False, help="Generate AS events related differential poly(A) tail length.")
     parser_report.add_argument('-diff', dest="diff", action="store_true", default=False, help="Generate the statistics for differential spliced events.")
-    parser_report.add_argument('-html', dest="report", action="store_true", default=False, help="Generate the html report for the results have been generated. "
+    parser_report.add_argument('-html', dest="html", action="store_true", default=False, help="Generate the html report for the results have been generated. "
                                                                                                 "Note, if you want to visualize the result of GO enrichment, you need to specify the '-bg' parameter.")
     parser_report.add_argument('-bg', dest="gene2goFile", type=str, default=None, help="The mapping file between gene and go term used for GO enrichment analysis.")
 

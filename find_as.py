@@ -596,11 +596,11 @@ def find_all_as(dataObj=None, refParams=None, dirSpec=None):
                    isoform2reads=isoform2reads)
     find_single_as(asType="A5SS", gene2ReadsDict=annoDict, anno=True, outFile="LR/A5SS.bed6+", outAppend=False,
                    isoform2reads=isoform2reads)
-    find_single_as(asType="A5SS", gene2ReadsDict=annoDict, anno=False, outFile="LR/A5SS.bed6+", outAppend=True,
+    find_single_as(asType="A5SS", gene2ReadsDict=novelDict, anno=False, outFile="LR/A5SS.bed6+", outAppend=True,
                    isoform2reads=isoform2reads)
     find_single_as(asType="A3SS", gene2ReadsDict=annoDict, anno=True, outFile="LR/A3SS.bed6+", outAppend=False,
                    isoform2reads=isoform2reads)
-    find_single_as(asType="A3SS", gene2ReadsDict=annoDict, anno=False, outFile="LR/A3SS.bed6+", outAppend=True,
+    find_single_as(asType="A3SS", gene2ReadsDict=novelDict, anno=False, outFile="LR/A3SS.bed6+", outAppend=True,
                    isoform2reads=isoform2reads)
 
     if os.path.islink("LR/IR.confident.bed6+") or os.path.exists("LR/IR.confident.bed6+"):

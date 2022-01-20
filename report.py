@@ -30,16 +30,8 @@ def reportReadsCorrectedEval(dataObj=None, dirSpec=None):
     from plotRscriptStrs import plotReadsCorrectedEvalStr
     robjects.r(plotReadsCorrectedEvalStr)
     robjects.r.plotReadsCorrectedEval(rawMappedBed, correctMappedBed, "readsCorrectResult.pdf")
-    # rawMapped = pd.read_csv(rawMappedBed, sep="\t", header=None)
-    # correctMapped = pd.read_csv(correctMappedBed, sep="\t", header=None)
-    # rawMapped["accuracy"] = (rawMapped.iloc[:, 12] * rawMapped.iloc[:, 13])/100
-    # correctMapped["accuracy"] = (correctMapped.iloc[:, 12] * correctMapped.iloc[:, 13])/100
-    # for x in [rawMapped, correctMapped]:
-    #     sns.distplot(x.accuracy, kde=False, bins=range(0, 100, 10))
-    # plt.savefig("readsCorrectResult.pdf")
     print getCurrentTime() + " Plotting Reads Corrected Evaluation for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
     return ["readsCorrectResult.pdf"]
-    # g.savefig("readsCorrectResult.pdf")
 
 def gcAcrossRead(fxFile, outFile, interval=20):
     import math
@@ -305,7 +297,6 @@ def reportAlleleAS1(dataObj=None, refParams=None, dirSpec=None):
         print getCurrentTime() + " No Allele-Specific AS available for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
         return
     asHaplo = pd.read_csv(asHaploFile, header=None, sep="\t", names=["gene", "asType", "refGene", "asEvent", "haplo1", "haplo1isos", "haplo2", "haplo2isos"])
-    # asHaplo = asHaplo.loc[:, ["gene", "haplo1", "haplo1isos", "haplo2", "haplo2isos"]].drop_duplicates()
     alleleAsDir = os.path.join(os.getcwd(), "alleleAsPlots")
     resolveDir(alleleAsDir)
     isoformFile = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
@@ -390,11 +381,6 @@ def reportAlleleAS1(dataObj=None, refParams=None, dirSpec=None):
                   ",".join(map(str, highlightStarts)), ",".join(map(str, highlightEnds)), highlightColorDict[name[2]],
                   outName, alleleAsDir]
         runParams.append(params)
-
-        # robjects.r.plotAlleleAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0],
-        #                                   min(chromStarts), max(chromEnds), ",".join(map(str, highlightStarts)),
-        #                                   ",".join(map(str, highlightEnds)), highlightColorDict[name[1]], outName)
-        # alleleAsPdfs.append(os.path.join("{}.pdf".format(outName)))
         os.chdir(alleleAsDir)
 
     from plotRscriptStrs import plotAlleleAsStructureStr
@@ -407,61 +393,6 @@ def reportAlleleAS1(dataObj=None, refParams=None, dirSpec=None):
         alleleAsPdfs.append(os.path.join(params[12], "{}.pdf".format(params[11])))
     pool.close()
     pool.join()
-
-    # for i, row in asHaplo.iterrows():
-    #     outName = "{}.allele_as".format(row.gene)
-    #     resolveDir(outName)
-    #     haplo1isosOut = open("haplo1isosOut.bed", "w")
-    #     haplo2isosOut = open("haplo2isosOut.bed", "w")
-    #     chromStarts = []
-    #     chromEnds = []
-    #     chrom = set()
-    #     for x in row.haplo1isos.split("_"):
-    #         chromStarts.append(isoBedObj.reads[x].chromStart)
-    #         chromEnds.append(isoBedObj.reads[x].chromEnd)
-    #         chrom.add(isoBedObj.reads[x].chrom)
-    #         print >>haplo1isosOut, str(isoBedObj.reads[x])
-    #     for x in row.haplo2isos.split("_"):
-    #         chromStarts.append(isoBedObj.reads[x].chromStart)
-    #         chromEnds.append(isoBedObj.reads[x].chromEnd)
-    #         chrom.add(isoBedObj.reads[x].chrom)
-    #         print >>haplo2isosOut, str(isoBedObj.reads[x])
-    #     haplo1isosOut.close()
-    #     haplo2isosOut.close()
-    #     cmd = '''
-    #         bed2gpe.pl -g 13 haplo1isosOut.bed > haplo1isosOut.gpe;
-    #         genePredToGtf file haplo1isosOut.gpe haplo1isosOut.gtf;
-    #         bed2gpe.pl -g 13 haplo2isosOut.bed > haplo2isosOut.gpe;
-    #         genePredToGtf file haplo2isosOut.gpe haplo2isosOut.gtf;
-    #     '''
-    #     subprocess.call(cmd, shell=True, executable="/bin/bash")
-    #
-    #     haplo1reads = itertools.chain.from_iterable([collapsedTrans2reads[x] for x in row.haplo1isos.split("_")])
-    #     haplo2reads = itertools.chain.from_iterable([collapsedTrans2reads[x] for x in row.haplo2isos.split("_")])
-    #     getSubSamByName(flncBam, nameList=haplo1reads, isBam=True, nameListIsFile=False, outPrefix="haplo1.flnc",
-    #                     sort=True, threads=dataObj.single_run_threads)
-    #     getSubSamByName(flncBam, nameList=haplo2reads, isBam=True, nameListIsFile=False, outPrefix="haplo2.flnc",
-    #                     sort=True, threads=dataObj.single_run_threads)
-    #     cmd = "samtools cat haplo1.flnc.sorted.bam haplo2.flnc.sorted.bam | samtools sort -@ {} > {}.flnc.sorted.bam"
-    #     cmd = cmd.format(dataObj.single_run_threads, outName)
-    #     subprocess.call(cmd, shell=True, executable="/bin/bash")
-    #     refGenome = refParams.ref_genome
-    #     gtfs = "{},{}".format(os.path.join(os.getcwd(), "haplo1.flnc.sorted.bam"), os.path.join(os.getcwd(), "haplo2.flnc.sorted.bam"))
-    #     mixedBam = os.path.join(os.getcwd(), "{}.flnc.sorted.bam".format(outName))
-    #     haploBams = "{},{}".format(os.path.join(os.getcwd(), "haplo1.flnc.sorted.bam"), os.path.join(os.getcwd(), "haplo2.flnc.sorted.bam"))
-    #
-    #     targetNgsBam = ""
-    #     if dataObj.ngs_left_reads or dataObj.ngs_right_reads:
-    #         ngsBam = os.path.join(baseDir, "mapping", "rna-seq", "reassembly", "tmp.bam")
-    #         cmd = "samtools view -h {} {} | samtools sort - > ngsReads.sorted.bam".format(ngsBam, "{}:{}-{}".format(list(chrom)[0], min(chromStarts), max(chromEnds)))
-    #         subprocess.call(cmd, shell=True, executable="/bin/bash")
-    #         targetNgsBam = os.path.join(os.getcwd(), "ngsReads.sorted.bam")
-    #
-    #     from plotRscriptStrs import plotAllelicAsStructureStr
-    #     robjects.r(plotAllelicAsStructureStr)
-    #     robjects.r.plotAllelicAsStructure(refGenome, gtfs, mixedBam, haploBams, targetNgsBam, list(chrom)[0], min(chromStarts), max(chromEnds), outName)
-    #     allelicAsPdfs.append(os.path.join("{}.pdf".format(outName)))
-    #     os.chdir(allelicAsDir)
 
     writer = PyPDF2.PdfFileWriter()
     for i in alleleAsPdfs:
@@ -538,10 +469,7 @@ def report(dataToProcess=None, refInfoParams=None, dirSpec=None, optionTools=Non
         refParams = refInfoParams[dataObj.ref_strain]
         projectName, sampleName = dataObj.project_name, dataObj.sample_name
         print getCurrentTime() + " Generate plot report for project {} sample {}...".format(projectName, sampleName)
-        # baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
         prevDir = os.getcwd()
-        # reportDir = os.path.join(baseDir, "reports")
-        # resolveDir(reportDir)
         subDir = os.path.join(reportDir, "{}_{}".format(projectName, sampleName))
         resolveDir(subDir)
 
