@@ -266,9 +266,9 @@ if __name__ == "__main__":
     parser_report.add_argument('-html', dest="html", action="store_true", default=False, help="Generate the html report for the results have been generated. "
                                                                                                 "Note, if you want to visualize the result of GO enrichment, you need to specify the '-bg' parameter.")
     parser_report.add_argument('-bg', dest="gene2goFile", type=str, default=None, help="The mapping file between gene and go term used for GO enrichment analysis.")
-    parser_goAS.add_argument('-cutoff', dest="cutoff", type=float, default=0.05, help="The cutoff used to filter the output. Default: 0.05")
-    parser_goAS.add_argument('-filterBy', dest="filterBy", type=str, choices=["pvalue", "p.adjust"], default="p.adjust", help="The value used to filter. Default: p.adjust.")
-    parser_goAS.add_argument('-showCategory', dest="showCategory", type=int, default=20, help="The number of items to show off. Default: 20.")
+    parser_report.add_argument('-cutoff', dest="cutoff", type=float, default=0.05, help="The cutoff used to filter the output. Default: 0.05")
+    parser_report.add_argument('-filterBy', dest="filterBy", type=str, choices=["pvalue", "p.adjust"], default="p.adjust", help="The value used to filter. Default: p.adjust.")
+    parser_report.add_argument('-showCategory', dest="showCategory", type=int, default=20, help="The number of items to show off. Default: 20.")
 
     parser_all = subparsers.add_parser('all', help="Dynamically perform all analysis with the setting!")
     parser_all.add_argument('-c', dest="correction", action="store_true", default=False, help="Correct the flnc reads with fmlrc2.")
