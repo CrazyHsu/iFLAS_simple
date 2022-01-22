@@ -182,7 +182,7 @@ plotTargetGenesGoEnrichmentStr = '''
     library(AnnotationDbi)
     library(clusterProfiler)
 
-    plotTargetGenesGoEnrichment <- function(targetGeneFiles, sampleNames, gene2goFile, outName){
+    plotTargetGenesGoEnrichment <- function(targetGeneFiles, sampleNames, gene2goFile, outName, cutoff, filterBy, showCategory){
         targetGeneFiles <- unlist(strsplit(targetGeneFiles, ","))
         sampleNames <- unlist(strsplit(sampleNames, ","))
         gene2go <- read.delim(gene2goFile, header=T, sep="\t")
@@ -199,7 +199,8 @@ plotTargetGenesGoEnrichmentStr = '''
                 goRes <- enricher(genes, TERM2GENE = go2gene, TERM2NAME = go2term, pvalueCutoff = 1, qvalueCutoff=1, maxGSSize = 100000)
                 goResult <- summary(goRes)
                 # goResult <- goResult[order(goResult$p.adjust),]
-                goResult <- goResult[which(goResult$p.adjust<=0.05),]
+                goResult <- goResult[which(goResult[filterBy]<=cutoff),]
+                # goResult <- goResult[which(goResult$p.adjust<=0.05),]
                 goResult$Ontology <- Ontology(as.vector(goResult$ID))
                 goResult <- goResult[c(1, ncol(goResult), 2:(ncol(goResult)-1))]
                 goResult$Ontology <- revalue(goResult$Ontology, c("BP"="Biological process", "MF"="Molecular function", "CC"="Cellular component"))
@@ -219,7 +220,7 @@ plotTargetGenesGoEnrichmentStr = '''
 
             r_bind_new <- new("compareClusterResult", compareClusterResult = r_bind)
             pdf(outPdf, width=10, height=8)
-            p <- dotplot(r_bind_new, showCategory=30, x=~group) + scale_color_continuous(low='purple', high='green') + 
+            p <- dotplot(r_bind_new, showCategory=showCategory, x=~group) + scale_color_continuous(low='purple', high='green') + 
                 scale_y_discrete(labels=function(x) str_wrap(x, width=100)) + 
                 scale_size(range=c(0, 5)) + ggplot2::facet_grid(~level)
             print(p)
@@ -230,7 +231,7 @@ plotTargetGenesGoEnrichmentStr = '''
             genes <- as.vector(genes[,1])
             goRes <- enricher(genes, TERM2GENE = go2gene, TERM2NAME = go2term, pvalueCutoff = 1, qvalueCutoff=0.05, maxGSSize = 100000)
             goResult <- summary(goRes)
-            goResult <- goResult[which(goResult$p.adjust<=0.05),]
+            goResult <- goResult[which(goResult[filterBy]<=cutoff),]
             goResult$Ontology <- Ontology(as.vector(goResult$ID))
             goResult <- goResult[c(1, ncol(goResult), 2:(ncol(goResult)-1))]
             goResult$Ontology <- revalue(goResult$Ontology, c("BP"="Biological process", "MF"="Molecular function", "CC"="Cellular component"))
@@ -239,7 +240,7 @@ plotTargetGenesGoEnrichmentStr = '''
             outFile <- paste0(sample, ".goEnrichResults.txt")
             write.table(goResult, file=outFile, sep = "\t", row.names = FALSE, col.names = TRUE, quote = F)
             pdf(outPdf, width=10, height=8)
-            p <- dotplot(goRes, showCategory=30) + scale_color_continuous(low='purple', high='green') + 
+            p <- dotplot(goRes, showCategory=showCategory) + scale_color_continuous(low='purple', high='green') + 
                 scale_y_discrete(labels=function(x) str_wrap(x, width=100)) + scale_size(range=c(0, 5))
             print(p)
             dev.off()

@@ -788,7 +788,8 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 from rpy2.rinterface import RRuntimeWarning
                 warnings.filterwarnings("ignore", category=RRuntimeWarning)
                 robjects.r(plotTargetGenesGoEnrichmentStr)
-                robjects.r.plotTargetGenesGoEnrichment("dasg.lst", outName, gene2goFile, outName)
+                robjects.r.plotTargetGenesGoEnrichment("dasg.lst", outName, gene2goFile, outName, float(args.cutoff),
+                                                       args.filterBy, int(args.showCategory))
                 enrichResult = os.path.abspath(outName + ".goEnrichResults.txt")
                 enrichPlot = convertPdf2png(inPdf=os.path.abspath(outName + ".pdf"))
                 resultDict["das"][compPair].update({"goEnrichResults": enrichResult})

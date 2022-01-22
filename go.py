@@ -49,7 +49,9 @@ def go(args, optionTools=None, dirSpec=None):
     outName = args.outName
     robjects.r(plotTargetGenesGoEnrichmentStr)
     if isinstance(validateTargetGeneFiles, list) and isinstance(validateSampleNames, list):
-        robjects.r.plotTargetGenesGoEnrichment(",".join(validateTargetGeneFiles), ",".join(validateSampleNames), gene2goFile, outName)
+        robjects.r.plotTargetGenesGoEnrichment(",".join(validateTargetGeneFiles), ",".join(validateSampleNames),
+                                               gene2goFile, outName, float(args.cutoff), args.filterBy, int(args.showCategory))
     else:
-        robjects.r.plotTargetGenesGoEnrichment(validateTargetGeneFiles, validateSampleNames, gene2goFile, outName)
+        robjects.r.plotTargetGenesGoEnrichment(validateTargetGeneFiles, validateSampleNames, gene2goFile, outName,
+                                               float(args.cutoff), args.filterBy, int(args.showCategory))
     print getCurrentTime() + " Perform GO enrichment for target genes done!"

@@ -67,10 +67,15 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                         targetGenes = args.genes
                         # visual_as(dataObj=dataObj, targetGenes=targetGenes, refParams=refParams, dirSpec=dirSpec)
                         pool.apply_async(visual_as, (dataObj, targetGenes, refParams, dirSpec))
-                    if args.command == 'rank_as':
-                        from rank_as import rank_as
-                        # rank_as(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
-                        pool.apply_async(rank_as, (dataObj, dirSpec, refParams))
+                    if args.command == 'rank_iso':
+                        from rank_iso import rank_iso
+                        # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
+                        rawDataObjs = strain2data[proj][ref_strain][strain]
+                        pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, rawDataObjs, optionTools))
+
+                        # from tissue_spec_iso import tissue_spec_iso
+                        # rawDataObjs = strain2data[proj][ref_strain][strain]
+                        # tissue_spec_iso(dataObj, rawDataObjs, dirSpec)
                     if args.command == 'allele_as':
                         from allele_as import allele_as
                         allele_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, args=args)
@@ -132,10 +137,10 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                 targetGenes = args.genes
                 # visual_as(dataObj=dataObj, targetGenes=targetGenes, refParams=refParams, dirSpec=dirSpec)
                 pool.apply_async(visual_as, (dataObj, targetGenes, refParams, dirSpec))
-            if args.command == 'rank_as':
-                from rank_as import rank_as
-                # rank_as(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
-                pool.apply_async(rank_as, (dataObj, dirSpec, refParams))
+            if args.command == 'rank_iso':
+                from rank_iso import rank_iso
+                # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
+                pool.apply_async(rank_iso, (dataObj, dirSpec, refParams))
             if args.command == 'allele_as':
                 from allele_as import allele_as
                 allele_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, args=args)
@@ -219,7 +224,7 @@ if __name__ == "__main__":
     parser_visualAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_visualAS.add_argument('-g', dest="genes", type=str, help="The gene list separated by comma or a single file contain genes one per line used for visualization.")
 
-    parser_rankAS = subparsers.add_parser('rank_as', help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
+    parser_rankAS = subparsers.add_parser('rank_iso', help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
     parser_rankAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
 
     parser_alleleAS = subparsers.add_parser('allele_as', help='Identify allele-related AS', usage='%(prog)s [options]')
@@ -242,6 +247,9 @@ if __name__ == "__main__":
     parser_goAS.add_argument('-cfg', dest="default_cfg", type=str, help="The config file used for init setting.")
     parser_goAS.add_argument('-tg', dest="targetGeneFile", type=str, help="The target gene file or file list separated by comma used for GO enrichment analysis.")
     parser_goAS.add_argument('-bg', dest="gene2goFile", type=str, default=None, help="The mapping file between gene and go term used for GO enrichment analysis.")
+    parser_goAS.add_argument('-cutoff', dest="cutoff", type=float, default=0.05, help="The cutoff used to filter the output. Default: 0.05")
+    parser_goAS.add_argument('-filterBy', dest="filterBy", type=str, choices=["pvalue", "p.adjust"], default="p.adjust", help="The value used to filter. Default: p.adjust.")
+    parser_goAS.add_argument('-showCategory', dest="showCategory", type=int, default=20, help="The number of items to show off. Default: 20.")
     parser_goAS.add_argument('-s', dest="sampleName", type=str, help="The sample name used plot the track, multi-sample should be separated by commma used for GO enrichment analysis.")
     parser_goAS.add_argument('-o', dest="outName", type=str, default="goEnrichment", help="The prefix of the GO enrichment output file.")
 
@@ -258,6 +266,9 @@ if __name__ == "__main__":
     parser_report.add_argument('-html', dest="html", action="store_true", default=False, help="Generate the html report for the results have been generated. "
                                                                                                 "Note, if you want to visualize the result of GO enrichment, you need to specify the '-bg' parameter.")
     parser_report.add_argument('-bg', dest="gene2goFile", type=str, default=None, help="The mapping file between gene and go term used for GO enrichment analysis.")
+    parser_goAS.add_argument('-cutoff', dest="cutoff", type=float, default=0.05, help="The cutoff used to filter the output. Default: 0.05")
+    parser_goAS.add_argument('-filterBy', dest="filterBy", type=str, choices=["pvalue", "p.adjust"], default="p.adjust", help="The value used to filter. Default: p.adjust.")
+    parser_goAS.add_argument('-showCategory', dest="showCategory", type=int, default=20, help="The number of items to show off. Default: 20.")
 
     parser_all = subparsers.add_parser('all', help="Dynamically perform all analysis with the setting!")
     parser_all.add_argument('-c', dest="correction", action="store_true", default=False, help="Correct the flnc reads with fmlrc2.")
