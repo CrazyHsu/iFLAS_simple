@@ -8,7 +8,7 @@ Last modified: 2022-01-18
 '''
 
 import sys, argparse
-# import pybedtools
+import pybedtools
 
 # from commonFuncs import *
 from commonObjs import *
