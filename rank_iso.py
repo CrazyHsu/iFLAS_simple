@@ -162,7 +162,7 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
         minTPM = min(tpmList)
         maxTPM = max(tpmList)
         meanTPM = sum(tpmList) / float(len(tpmList))
-        print >> isoEnumOut, "\t".join(map(str, [gene, longestIso, similarIsos, junc, isoformBed[longestIso].chrom,
+        print >> isoEnumOut, "\t".join(map(str, [gene, longestIso, similarIsos, isoformBed[longestIso].chrom, junc,
                                                  annotation, juncSupport, geneSupport, freq, minTPM, maxTPM,
                                                  meanTPM, cpc2IsoCoding[longestIso]]))
     isoEnumOut.close()
