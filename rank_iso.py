@@ -64,7 +64,7 @@ def cpc2eval(longestIso):
 
 
 def salmonQuant(dataObj, dirSpec):
-    cmd = "salmon index -t representIso.fa -i representIso_index --keepDuplicates -p {} 1>/dev/null 2>&1".format(dataObj.single_run_threads)
+    cmd = "salmon index -t longestIso.fa -i longestIso_index --keepDuplicates -p {} 1>/dev/null 2>&1".format(dataObj.single_run_threads)
     subprocess.call(cmd, shell=True)
 
     from preprocess import renameNGSdata2fastp, processRnaseq
@@ -79,7 +79,7 @@ def salmonQuant(dataObj, dirSpec):
             leftReads = " ".join([r.strip() for r in leftReadsRepeats[i].split(",")])
             rightReads = " ".join([r.strip() for r in rightReadsRepeats[i].split(",")])
             salmonOut = "repeat{}.salmon_quant".format(i)
-            cmd = "salmon quant -l A -i representIso_index -1 {} -2 {} -p {} -o {} --consensusSlack 0.5 --preMergeChainSubThresh 0.9 1>/dev/null_log 2>&1"
+            cmd = "salmon quant -l A -i longestIso_index -1 {} -2 {} -p {} -o {} --consensusSlack 0.5 --preMergeChainSubThresh 0.9 1>/dev/null 2>&1"
             cmd = cmd.format(leftReads, rightReads, dataObj.single_run_threads, salmonOut)
             subprocess.call(cmd, shell=True)
             quant_sf_list.append(os.path.abspath("{}/quant.sf".format(salmonOut)))
@@ -96,7 +96,7 @@ def salmonQuant(dataObj, dirSpec):
         for i in range(len(singleReadsRepeats)):
             singleReads = ",".join([i.strip() for i in singleReadsRepeats[i].split(",")])
             salmonOut = "repeat{}.salmon_quant".format(i)
-            cmd = "salmon quant -l A -i representIso_index -r {} -p {} -o {} --consensusSlack 0.5 --preMergeChainSubThresh 0.9 1>/dev/null_log 2>&1"
+            cmd = "salmon quant -l A -i longestIso_index -r {} -p {} -o {} --consensusSlack 0.5 --preMergeChainSubThresh 0.9 1>/dev/null 2>&1"
             cmd = cmd.format(singleReads, dataObj.single_run_threads, salmonOut)
             subprocess.call(cmd, shell=True)
             quant_sf_list.append(os.path.abspath("{}/quant.sf".format(salmonOut)))
@@ -128,10 +128,10 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
 
         gene = isoformBed[iso].otherList[0]
         if gene not in gene2isoDict:
-            gene2isoDict[gene] = {"isos": [iso], "count": sum(isoform2reads[iso])}
+            gene2isoDict[gene] = {"isos": [iso], "count": len(isoform2reads[iso])}
         else:
             gene2isoDict[gene]["isos"].append(iso)
-            gene2isoDict[gene]["count"] += sum(isoform2reads[iso])
+            gene2isoDict[gene]["count"] += len(isoform2reads[iso])
 
     longestIsoOut = open("longestIso.bed", "w")
     for junc in juncDict:
@@ -139,7 +139,7 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
         print >> longestIsoOut, str(isoformBed[longestIso])
     longestIsoOut.close()
 
-    cmd = '''cut -f 1-12 representIso.bed | bedtools getfasta -fi {} -bed - -name -split | seqkit replace -w 0 -p "(.*?):(.*)" -r '$1' > longestIso.fa'''.format(refParams.ref_genome)
+    cmd = '''cut -f 1-12 longestIso.bed | bedtools getfasta -fi {} -bed - -name -split | seqkit replace -w 0 -p "(.*?):(.*)" -r '$1' > longestIso.fa'''.format(refParams.ref_genome)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
     salmonIsoTMP = salmonQuant(dataObj, dirSpec)
