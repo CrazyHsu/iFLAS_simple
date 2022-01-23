@@ -193,7 +193,7 @@ def filterIsos(isoEnumerate, isoformBed, args):
     with open(isoEnumerate) as f:
         for line in f.readlines()[1:]:
             infoList = line.strip().split("\t")
-            gene, longestIso, annotation, readSupport = infoList[3], infoList[0], infoList[4], int(infoList[5])
+            gene, longestIso, annotation, readSupport = infoList[0], infoList[1], infoList[5], int(infoList[6])
             if gene not in hqGeneDF.index: continue
             if gene not in isoInfoDict:
                 isoInfoDict[gene] = {annotation: {longestIso: readSupport}}
