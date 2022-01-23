@@ -8,7 +8,7 @@ Last modified: 2022-01-18
 '''
 
 import sys, argparse
-import pybedtools
+# import pybedtools
 
 # from commonFuncs import *
 from commonObjs import *
@@ -36,7 +36,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
         else:
             strain2data[dataObj.project_name][dataObj.ref_strain][dataObj.strain].append(dataObj)
 
-    if optionTools.merge_data_from_same_strain:
+    if optionTools.merge_data_from_same_strain or args.merge:
         sampleMergedToProcess = mergeSample(strain2data)
         processNum = len(list(nestedDictValues(sampleMergedToProcess, returned="value")))
         pool = MyPool(processes=processNum)
@@ -96,7 +96,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
             from diff_as import diff_as
             # diff_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
             compCond = args.compCond
-            diff_as(sampleMergedToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=optionTools.merge_data_from_same_strain)
+            diff_as(sampleMergedToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=True)
         if args.command == 'go':
             from go import go
             go(args, optionTools=optionTools, dirSpec=dirSpec)
@@ -162,7 +162,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
             from diff_as import diff_as
             # diff_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
             compCond = args.compCond
-            diff_as(dataToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=optionTools.merge_data_from_same_strain)
+            diff_as(dataToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=False)
         if args.command == 'go':
             from go import go
             go(args, optionTools=optionTools, dirSpec=dirSpec)
@@ -196,59 +196,63 @@ def iflas(args):
 if __name__ == "__main__":
     USAGE = ' iFLAS: integrated Full Length Alternative Splicing analysis '
 
+    parent_parser = argparse.ArgumentParser(add_help=False)
+    parent_parser.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parent_parser.add_argument('-merge', dest="merge", action="store_true", default=False, help="Merge all samples from a same strain.")
+
     parser = argparse.ArgumentParser(usage='%(prog)s command [options]', description=USAGE)
     subparsers = parser.add_subparsers(title='command', metavar='', dest='command', prog=parser.prog)
-    parser_preprocess = subparsers.add_parser('preproc', help='Pre-process the raw PacBio/NanoPore/NGS data. When TGS and NGS data both are provide, This step will use fmlrc2 to correct the TGS read with the information in NGS', usage='%(prog)s [options]')
-    parser_preprocess.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_preprocess = subparsers.add_parser('preproc', parents=[parent_parser], help='Pre-process the raw PacBio/NanoPore/NGS data. When TGS and NGS data both are provide, This step will use fmlrc2 to correct the TGS read with the information in NGS', usage='%(prog)s [options]')
+    # parser_preprocess.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
 
-    parser_mapping = subparsers.add_parser('mapping', help='Mapping the TGS/NGS reads to the reference genome with minimap2', usage='%(prog)s [options]')
-    parser_mapping.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_mapping = subparsers.add_parser('mapping', parents=[parent_parser], help='Mapping the TGS/NGS reads to the reference genome with minimap2', usage='%(prog)s [options]')
+    # parser_mapping.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_mapping.add_argument('-c', dest="correction", action="store_true", default=False, help="Correct the flnc reads with fmlrc2.")
     parser_mapping.add_argument('-jcs', dest="juncCombSup", type=int, default=2, help="The number of junction combination supported by flnc reads. Default: 2.")
 
-    parser_collapse = subparsers.add_parser('collapse', help='Collapse corrected reads into high-confidence isoforms', usage='%(prog)s [options]')
-    parser_collapse.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_collapse = subparsers.add_parser('collapse', parents=[parent_parser], help='Collapse corrected reads into high-confidence isoforms', usage='%(prog)s [options]')
+    # parser_collapse.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
 
-    parser_filter = subparsers.add_parser('refine', help='Refine the splice junction with the information in short reads', usage='%(prog)s [options]')
-    parser_filter.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_filter = subparsers.add_parser('refine', parents=[parent_parser], help='Refine the splice junction with the information in short reads', usage='%(prog)s [options]')
+    # parser_filter.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_filter.add_argument('-adjust', dest="adjust", action="store_true", default=False, help="Adjust the strand orient by the information of junctions.")
     parser_filter.add_argument('-refine', dest="refine", action="store_true", default=False, help="Refine the junction position by the reads support.")
 
-    parser_findAS = subparsers.add_parser('find_as', help='Identify alternative splicing(AS) type from high-confidence isoforms. Four common AS type are included: intron retention, exon skipping, alternative 3 end splicing and alternative 5 end splicing', usage='%(prog)s [options]')
-    parser_findAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_findAS = subparsers.add_parser('find_as', parents=[parent_parser], help='Identify alternative splicing(AS) type from high-confidence isoforms. Four common AS type are included: intron retention, exon skipping, alternative 3 end splicing and alternative 5 end splicing', usage='%(prog)s [options]')
+    # parser_findAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_findAS.add_argument('-pa_rpkm', dest="paRPKM", type=float, default=0, help="Filter the pa cluster by RPKM(PAC). Default: 0.")
     parser_findAS.add_argument('-pa_sup', dest="pa_support", type=int, default=5, help="Filter the pa cluster by RPKM(PAC). Default: 5.")
     parser_findAS.add_argument('-conf_pa', dest="confidentPa", default=None, help="The confident PA file used for filtering the results.")
 
-    parser_visualAS = subparsers.add_parser('visual_as', help='Visualize the specific gene structure with details including isoform mapping, short reads coverage and AS types identified', usage='%(prog)s [options]')
-    parser_visualAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_visualAS = subparsers.add_parser('visual_as', parents=[parent_parser], help='Visualize the specific gene structure with details including isoform mapping, short reads coverage and AS types identified', usage='%(prog)s [options]')
+    # parser_visualAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_visualAS.add_argument('-g', dest="genes", type=str, help="The gene list separated by comma or a single file contain genes one per line used for visualization.")
 
-    parser_rankAS = subparsers.add_parser('rank_iso', help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
-    parser_rankAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_rankAS = subparsers.add_parser('rank_iso', parents=[parent_parser], help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
+    # parser_rankAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_rankAS.add_argument('-coding', dest="coding", action="store_true", default=False, help="Filter the isoforms by coding or not.")
     parser_rankAS.add_argument('-min_tpm', dest="min_tpm", type=float, default=0, help="Filter the isoforms by minimal TPM value.")
     parser_rankAS.add_argument('-reads_freq', dest="reads_freq", type=float, default=0, help="Filter isoforms by the frequency of reads.")
     parser_rankAS.add_argument('-read_support', dest="read_support", type=int, default=0, help="Filter isoforms by the count of reads.")
 
-    parser_alleleAS = subparsers.add_parser('allele_as', help='Identify allele-related AS', usage='%(prog)s [options]')
-    parser_alleleAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_alleleAS = subparsers.add_parser('allele_as', parents=[parent_parser], help='Identify allele-related AS', usage='%(prog)s [options]')
+    # parser_alleleAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_alleleAS.add_argument('-ase', dest="ase", action="store_true", default=False, help="Whether to Carry out ASE analysis.")
     parser_alleleAS.add_argument('-ref_fa', dest="refFa", default=None, help="The reference fasta file used to be quantified in ASE.")
     parser_alleleAS.add_argument('-alt_fa', dest="altFa", default=None, help="The alternative fasta file used to be quantified in ASE.")
     parser_alleleAS.add_argument('-fbs', dest="useFreebayes", action="store_true", default=False, help="Call the heterozygosity SNPs with freebayes in ASE.")
 
-    parser_palenAS = subparsers.add_parser('palen_as', help='Identify functional poly(A) tail length related to AS', usage='%(prog)s [options]')
-    parser_palenAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_palenAS = subparsers.add_parser('palen_as', parents=[parent_parser], help='Identify functional poly(A) tail length related to AS', usage='%(prog)s [options]')
+    # parser_palenAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_palenAS.add_argument('-pa_sup', dest="pa_support", type=int, default=10, help="The pa cluster coverage supported by flnc reads. Default: 10.")
     parser_palenAS.add_argument('-conf_pac', dest="confidentPac", default=None, help="The confident PAC file used for filtering the results")
 
-    parser_diffAS = subparsers.add_parser('diff_as', help='Carry out differential AS ananlysis among conditions', usage='%(prog)s [options]')
-    parser_diffAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_diffAS = subparsers.add_parser('diff_as', parents=[parent_parser], help='Carry out differential AS ananlysis among conditions', usage='%(prog)s [options]')
+    # parser_diffAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_diffAS.add_argument('-d', dest="compCond", type=str, help="The condition file used to detect differential AS between samples.")
 
-    parser_goAS = subparsers.add_parser('go', help='Perform GO enrichment analysis and plot results for the specified gene set or multiple gene sets', usage='%(prog)s [options]')
-    parser_goAS.add_argument('-cfg', dest="default_cfg", type=str, help="The config file used for init setting.")
+    parser_goAS = subparsers.add_parser('go', parents=[parent_parser], help='Perform GO enrichment analysis and plot results for the specified gene set or multiple gene sets', usage='%(prog)s [options]')
+    # parser_goAS.add_argument('-cfg', dest="default_cfg", type=str, help="The config file used for init setting.")
     parser_goAS.add_argument('-tg', dest="targetGeneFile", type=str, help="The target gene file or file list separated by comma used for GO enrichment analysis.")
     parser_goAS.add_argument('-bg', dest="gene2goFile", type=str, default=None, help="The mapping file between gene and go term used for GO enrichment analysis.")
     parser_goAS.add_argument('-cutoff', dest="cutoff", type=float, default=0.05, help="The cutoff used to filter the output. Default: 0.05")
@@ -257,8 +261,8 @@ if __name__ == "__main__":
     parser_goAS.add_argument('-s', dest="sampleName", type=str, help="The sample name used plot the track, multi-sample should be separated by commma used for GO enrichment analysis.")
     parser_goAS.add_argument('-o', dest="outName", type=str, default="goEnrichment", help="The prefix of the GO enrichment output file.")
 
-    parser_report = subparsers.add_parser('report', help='Automatic detect the plots generated in each step, and merge them into a report file', usage='%(prog)s [options]')
-    parser_report.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_report = subparsers.add_parser('report', parents=[parent_parser], help='Automatic detect the plots generated in each step, and merge them into a report file', usage='%(prog)s [options]')
+    # parser_report.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_report.add_argument('-all', dest="all", action="store_true", default=False, help="Generate all the plots.")
     parser_report.add_argument('-basic', dest="basic", action="store_true", default=False, help="Generate basic information plots.")
     parser_report.add_argument('-asp', dest="asp", action="store_true", default=False, help="Generate AS pattern plots.")

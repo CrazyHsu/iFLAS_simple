@@ -249,7 +249,7 @@ def rank_iso(dataObj=None, dirSpec=None, refParams=None, args=None, rawDataObjs=
     # isoEnumerate = "isoEnumerate.txt"
     filterIsos(isoEnumerate, isoformBed, args)
 
-    if optionTools and optionTools.merge_data_from_same_strain:
+    if optionTools and (optionTools.merge_data_from_same_strain or args.merge):
         from tissue_spec_iso import tissue_spec_iso
         tissue_spec_iso(dataObj, rawDataObjs, dirSpec, isoformBed, isoDict)
     os.chdir(prevDir)
