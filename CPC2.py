@@ -320,10 +320,11 @@ def calculate_potential(fasta, strand, output_orf, outfile):
         set directories and check depending tools existance
     '''
 
-    data_dir = "utils/"
-    lib_dir = "utils/"
-    app_svm_scale = lib_dir + "svm-scale"
-    app_svm_predict = lib_dir + "svm-predict"
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(scriptDir, "utils/")
+    lib_dir = os.path.join(scriptDir, "utils/")
+    app_svm_scale = os.path.join(lib_dir, "svm-scale")
+    app_svm_predict = os.path.join(lib_dir, "svm-predict")
     os.system('test -x ' + app_svm_scale + ' || echo \"[ERROR] No excutable svm-scale on CPC2 path!\" > /dev/stderr')
     os.system(
         'test -x ' + app_svm_predict + ' || echo \"[ERROR] No excutable svm-predict on CPC2 path!\" > /dev/stderr')
