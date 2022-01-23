@@ -7,14 +7,15 @@ Created on: 2022-01-20
 Last modified: 2022-01-20
 '''
 
-from yattag import Doc, indent
 import fitz
-from collections import Counter
 import pandas as pd
 import numpy as np
-import os, argparse, glob, subprocess
-from commonFuncs import validateFile, resolveDir, makeLink
 import warnings
+import os, argparse, glob, subprocess
+from distutils.dir_util import copy_tree
+from yattag import Doc, indent
+from collections import Counter
+from commonFuncs import validateFile, resolveDir, makeLink
 
 
 ################# Functions ##################
@@ -607,59 +608,59 @@ def convertPdf2png(inPdf=None, outDir=None, pageIndex=0):
     pix.writePNG(outPNG)
     return outPNG
 
-def convert(reportDict, iflasOut):
-    for sample in reportDict:
-        basicStatisticsDir = os.path.join(iflasOut, sample, "basicStatistics")
-        geneDir = os.path.join(iflasOut, sample, "genes")
-        resolveDir(basicStatisticsDir, chdir=False)
-        resolveDir(geneDir, chdir=False)
-        if sample == "mergedSample":
-            diffASDir = os.path.join(basicStatisticsDir, "diffAS")
-            goEnrichDir = os.path.join(basicStatisticsDir, "goEnrich")
-            resolveDir(diffASDir, chdir=False)
-            resolveDir(goEnrichDir, chdir=False)
-            diffASPdf = reportDict[sample]["basicStatistics"]["diffAS"][1]
-            goEnrichPdf = reportDict[sample]["basicStatistics"]["goEnrich"][1]
-            reportDict[sample]["basicStatistics"]["diffAS"][1] = convertPdf2png(diffASPdf, diffASDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["goEnrich"][1] = convertPdf2png(goEnrichPdf, goEnrichDir, pageIndex=0)
-        else:
-            readsCorrectionDir = os.path.join(basicStatisticsDir, "readsCorrection")
-            reportReadsContentEvalDir = os.path.join(basicStatisticsDir, "reportReadsContentEval")
-            asPatternDir = os.path.join(basicStatisticsDir, "asPattern")
-            isoformRankDir = os.path.join(basicStatisticsDir, "isoformRank")
-            resolveDir(readsCorrectionDir, chdir=False)
-            resolveDir(reportReadsContentEvalDir, chdir=False)
-            resolveDir(asPatternDir, chdir=False)
-            resolveDir(isoformRankDir, chdir=False)
-            readsCorrectionPdf = reportDict[sample]["basicStatistics"]["readsCorrection"][1]
-            gcFlncPdf = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_of_raw_flnc"][1]
-            gcAcrossFlncPdf = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_across_raw_flnc"][1]
-            LengthDistributionPdf1 = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][0]
-            LengthDistributionPdf2 = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][1]
-            asAnnoPdf = reportDict[sample]["basicStatistics"]["asPattern"]["asAnno"][1]
-            asSpliceSitePdf = reportDict[sample]["basicStatistics"]["asPattern"]["asSpliceSite"][1]
-            isoformRankPdf = reportDict[sample]["basicStatistics"]["isoformRank"][0]
-            reportDict[sample]["basicStatistics"]["readsCorrection"][1] = convertPdf2png(readsCorrectionPdf, readsCorrectionDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_of_raw_flnc"][1] = convertPdf2png(gcFlncPdf, reportReadsContentEvalDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_across_raw_flnc"][1] = convertPdf2png(gcAcrossFlncPdf, reportReadsContentEvalDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][0] = convertPdf2png(LengthDistributionPdf1, reportReadsContentEvalDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][1] = convertPdf2png(LengthDistributionPdf2, reportReadsContentEvalDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["asPattern"]["asAnno"][1] = convertPdf2png(asAnnoPdf, asPatternDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["asPattern"]["asSpliceSite"][1] = convertPdf2png(asSpliceSitePdf, asPatternDir, pageIndex=0)
-            reportDict[sample]["basicStatistics"]["isoformRank"][0] = convertPdf2png(isoformRankPdf, isoformRankDir, pageIndex=0)
-
-        for gene in reportDict[sample]:
-            targetGeneDir = os.path.join(geneDir, gene)
-            resolveDir(targetGeneDir, chdir=False)
-            if "isoformStruc" in reportDict[sample][gene]:
-                isoformStrucPdf = reportDict[sample][gene]["isoformStruc"]
-                reportDict[sample][gene]["isoformStruc"] = convertPdf2png(isoformStrucPdf, targetGeneDir, pageIndex=0)
-            if "alleleAS" in reportDict[sample][gene]:
-                alleleASPdf = reportDict[sample][gene]["alleleAS"]
-                reportDict[sample][gene]["isoformStruc"] = convertPdf2png(alleleASPdf, targetGeneDir, pageIndex=0)
-            if "paTailAS" in reportDict[sample][gene]:
-                paTailASPdf = reportDict[sample][gene]["paTailAS"]
-                reportDict[sample][gene]["isoformStruc"] = convertPdf2png(paTailASPdf, targetGeneDir, pageIndex=0)
+# def convert(reportDict, iflasOut):
+#     for sample in reportDict:
+#         basicStatisticsDir = os.path.join(iflasOut, sample, "basicStatistics")
+#         geneDir = os.path.join(iflasOut, sample, "genes")
+#         resolveDir(basicStatisticsDir, chdir=False)
+#         resolveDir(geneDir, chdir=False)
+#         if sample == "mergedSample":
+#             diffASDir = os.path.join(basicStatisticsDir, "diffAS")
+#             goEnrichDir = os.path.join(basicStatisticsDir, "goEnrich")
+#             resolveDir(diffASDir, chdir=False)
+#             resolveDir(goEnrichDir, chdir=False)
+#             diffASPdf = reportDict[sample]["basicStatistics"]["diffAS"][1]
+#             goEnrichPdf = reportDict[sample]["basicStatistics"]["goEnrich"][1]
+#             reportDict[sample]["basicStatistics"]["diffAS"][1] = convertPdf2png(diffASPdf, diffASDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["goEnrich"][1] = convertPdf2png(goEnrichPdf, goEnrichDir, pageIndex=0)
+#         else:
+#             readsCorrectionDir = os.path.join(basicStatisticsDir, "readsCorrection")
+#             reportReadsContentEvalDir = os.path.join(basicStatisticsDir, "reportReadsContentEval")
+#             asPatternDir = os.path.join(basicStatisticsDir, "asPattern")
+#             isoformRankDir = os.path.join(basicStatisticsDir, "isoformRank")
+#             resolveDir(readsCorrectionDir, chdir=False)
+#             resolveDir(reportReadsContentEvalDir, chdir=False)
+#             resolveDir(asPatternDir, chdir=False)
+#             resolveDir(isoformRankDir, chdir=False)
+#             readsCorrectionPdf = reportDict[sample]["basicStatistics"]["readsCorrection"][1]
+#             gcFlncPdf = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_of_raw_flnc"][1]
+#             gcAcrossFlncPdf = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_across_raw_flnc"][1]
+#             LengthDistributionPdf1 = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][0]
+#             LengthDistributionPdf2 = reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][1]
+#             asAnnoPdf = reportDict[sample]["basicStatistics"]["asPattern"]["asAnno"][1]
+#             asSpliceSitePdf = reportDict[sample]["basicStatistics"]["asPattern"]["asSpliceSite"][1]
+#             isoformRankPdf = reportDict[sample]["basicStatistics"]["isoformRank"][0]
+#             reportDict[sample]["basicStatistics"]["readsCorrection"][1] = convertPdf2png(readsCorrectionPdf, readsCorrectionDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_of_raw_flnc"][1] = convertPdf2png(gcFlncPdf, reportReadsContentEvalDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["GC_across_raw_flnc"][1] = convertPdf2png(gcAcrossFlncPdf, reportReadsContentEvalDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][0] = convertPdf2png(LengthDistributionPdf1, reportReadsContentEvalDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["reportReadsContentEval"]["LengthDistribution"][1] = convertPdf2png(LengthDistributionPdf2, reportReadsContentEvalDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["asPattern"]["asAnno"][1] = convertPdf2png(asAnnoPdf, asPatternDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["asPattern"]["asSpliceSite"][1] = convertPdf2png(asSpliceSitePdf, asPatternDir, pageIndex=0)
+#             reportDict[sample]["basicStatistics"]["isoformRank"][0] = convertPdf2png(isoformRankPdf, isoformRankDir, pageIndex=0)
+#
+#         for gene in reportDict[sample]:
+#             targetGeneDir = os.path.join(geneDir, gene)
+#             resolveDir(targetGeneDir, chdir=False)
+#             if "isoformStruc" in reportDict[sample][gene]:
+#                 isoformStrucPdf = reportDict[sample][gene]["isoformStruc"]
+#                 reportDict[sample][gene]["isoformStruc"] = convertPdf2png(isoformStrucPdf, targetGeneDir, pageIndex=0)
+#             if "alleleAS" in reportDict[sample][gene]:
+#                 alleleASPdf = reportDict[sample][gene]["alleleAS"]
+#                 reportDict[sample][gene]["isoformStruc"] = convertPdf2png(alleleASPdf, targetGeneDir, pageIndex=0)
+#             if "paTailAS" in reportDict[sample][gene]:
+#                 paTailASPdf = reportDict[sample][gene]["paTailAS"]
+#                 reportDict[sample][gene]["isoformStruc"] = convertPdf2png(paTailASPdf, targetGeneDir, pageIndex=0)
 
 def retrieveResults(dataToProcess, dirSpec, optionTools, args):
     reportDir = os.path.join(dirSpec.out_dir, "reports")
@@ -802,7 +803,9 @@ def generateHtml(dataToProcess, dirSpec, optionTools, args):
     resultDict = retrieveResults(dataToProcess, dirSpec, optionTools, args)
     htmlOut = os.path.join(dirSpec.out_dir, "reports", "html")
     # htmlOut = "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/iflas_html_test"
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
     resolveDir(htmlOut)
+    copy_tree(os.path.join(scriptDir, "assets"), "assets")
     # resultDict = {"allSampleMerged": {"testGene1": "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/test.pdf"},
     #               "das": {"sampl1_vs_sample2": {"IR": "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/wangbo_embryo_vs_wangbo_endosperm.sigDiffAS/IR.sig.txt",
     #                                             "SE": "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/wangbo_embryo_vs_wangbo_endosperm.sigDiffAS/SE.sig.txt",

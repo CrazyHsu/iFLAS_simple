@@ -154,7 +154,7 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
         longestIso = juncDict[junc]["longest"][0]
         similarIsos = ",".join(juncDict[junc]["iso"])
         gene = juncDict[junc]["gene"][0]
-        juncSupport = sum([isoform2reads[x] for x in juncDict[junc]["iso"]])
+        juncSupport = sum([len(isoform2reads[x]) for x in juncDict[junc]["iso"]])
         geneSupport = gene2isoDict[gene]["count"]
         freq = float(juncSupport) / geneSupport
         annotation = "annotated" if junc in annoJuncDict else "novel"
