@@ -59,7 +59,7 @@ def procAsFile(asFile, asType="IR"):
 def tissue_spec_iso(dataObj, rawDataObjs, dirSpec, isoformBed, isoDict):
     sampleNames = [x.sample_name for x in rawDataObjs]
     print getCurrentTime() + " Start finding tissue specific isoforms among".format(",".join(sampleNames))
-    baseDir = os.path.join(dirSpec.out_dir, dataObj.projectName, dataObj.sampleName)
+    baseDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name)
     readsGroup = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
 
     iso2reads = {}

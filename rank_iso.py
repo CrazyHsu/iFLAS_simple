@@ -147,8 +147,8 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
     cpc2IsoCoding = cpc2eval("longestIso.fa")
 
     isoEnumOut = open("isoEnumerate.txt", "w")
-    print >>isoEnumOut, "\t".join(["longestIso", "similarIsos", "junction", "gene", "annotation", "readSupport",
-                                   "readsFreq", "minTPM", "maxTPM", "meanTPM", "coding_potential"])
+    print >>isoEnumOut, "\t".join(["gene", "longestIso", "similarIsos", "chrom", "junction", "annotation", "readSupport",
+                                   "allReadsCount", "readsFreq", "minTPM", "maxTPM", "meanTPM", "codingPotential"])
     for junc in juncDict:
         if len(set(juncDict[junc]["gene"])) != 1: continue
         longestIso = juncDict[junc]["longest"][0]
@@ -162,22 +162,24 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
         minTPM = min(tpmList)
         maxTPM = max(tpmList)
         meanTPM = sum(tpmList) / float(len(tpmList))
-        print >> isoEnumOut, "\t".join(map(str, [longestIso, similarIsos, junc, gene, annotation, juncSupport, freq,
-                                                 minTPM, maxTPM, meanTPM, cpc2IsoCoding[longestIso]]))
+        print >> isoEnumOut, "\t".join(map(str, [gene, longestIso, similarIsos, junc, isoformBed[longestIso].chrom,
+                                                 annotation, juncSupport, geneSupport, freq, minTPM, maxTPM,
+                                                 meanTPM, cpc2IsoCoding[longestIso]]))
     isoEnumOut.close()
     return "isoEnumerate.txt"
 
 
-def filterIsos(isoEnumerate, isoformBed):
+def filterIsos(isoEnumerate, isoformBed, args):
     isoEnumerateDF = pd.read_csv(isoEnumerate, sep="\t")
     # filter by coding potential
-    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["coding_potential"] == "coding"]
+    if args.coding:
+        isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["codingPotential"] == "coding"]
     # filter by salmon tpm
-    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["minTPM"] >= 0.1]
+    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["minTPM"] >= float(args.min_tpm)]
     # filter by reads frequency
-    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readsFreq"] >= 0.05]
+    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readsFreq"] >= float(args.read_freq)]
     # filter by reads count
-    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readSupport"] >= 5]
+    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readSupport"] >= int(args.read_support)]
 
     # group filter
     isoEnumerateGroup = isoEnumerateDF.groupby("gene")
@@ -212,14 +214,15 @@ def filterIsos(isoEnumerate, isoformBed):
                 hqNovelIsos.append(iso)
                 hqAnnoIsos.append(annoMaxReadCountIso)
             elif annoMaxReadCount < novelIsos[iso] and novelIsos[iso] < 1.5 * annoMaxReadCount:
+                if iso not in isoEnumerateDF.longestIso.to_list() or annoMaxReadCountIso not in isoEnumerateDF.longestIso: continue
                 if float(isoEnumerateDF[isoEnumerateDF.longestIso==iso].minTPM) > float(isoEnumerateDF[isoEnumerateDF.longestIso==annoMaxReadCountIso].minTPM):
                     hqNovelIsos.append(iso)
                     hqAnnoIsos.append(annoMaxReadCountIso)
 
-    isoEnumerateDF[isoEnumerateDF.longestIso.isin(hqNovelIsos+hqAnnoIsos)].to_csv("hqIso.txt", sep="\t", index=False)
+    isoEnumerateDF[isoEnumerateDF.longestIso.isin(hqNovelIsos+hqAnnoIsos)].to_csv("hqIso.txt", sep="\t", index=False, header=True)
 
 
-def rank_iso(dataObj=None, dirSpec=None, refParams=None, rawDataObjs=None, optionTools=None):
+def rank_iso(dataObj=None, dirSpec=None, refParams=None, args=None, rawDataObjs=None, optionTools=None):
     projectName, sampleName = dataObj.project_name, dataObj.sample_name
     print getCurrentTime() + " Start finding high quality isoforms for project {} sample {}...".format(projectName, sampleName)
     baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
@@ -243,7 +246,8 @@ def rank_iso(dataObj=None, dirSpec=None, refParams=None, rawDataObjs=None, optio
 
     isoformBed = BedFile(isoformFile, type="bed12+").reads
     isoEnumerate = enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataObj, refParams, dirSpec)
-    filterIsos(isoEnumerate, isoformBed)
+    # isoEnumerate = "isoEnumerate.txt"
+    filterIsos(isoEnumerate, isoformBed, args)
 
     if optionTools and optionTools.merge_data_from_same_strain:
         from tissue_spec_iso import tissue_spec_iso

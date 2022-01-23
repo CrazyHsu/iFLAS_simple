@@ -71,7 +71,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                         from rank_iso import rank_iso
                         # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
                         rawDataObjs = strain2data[proj][ref_strain][strain]
-                        pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, rawDataObjs, optionTools))
+                        pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, args, rawDataObjs, optionTools))
 
                         # from tissue_spec_iso import tissue_spec_iso
                         # rawDataObjs = strain2data[proj][ref_strain][strain]
@@ -140,7 +140,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
             if args.command == 'rank_iso':
                 from rank_iso import rank_iso
                 # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
-                pool.apply_async(rank_iso, (dataObj, dirSpec, refParams))
+                pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, args))
             if args.command == 'allele_as':
                 from allele_as import allele_as
                 allele_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec, args=args)
@@ -226,6 +226,10 @@ if __name__ == "__main__":
 
     parser_rankAS = subparsers.add_parser('rank_iso', help='Score the isoform by the produce of each inclusion/exclusion ratio in that isoform, and rank all the isoforms from high to low', usage='%(prog)s [options]')
     parser_rankAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
+    parser_rankAS.add_argument('-coding', dest="coding", action="store_true", default=False, help="Filter the isoforms by coding or not.")
+    parser_rankAS.add_argument('-min_tpm', dest="min_tpm", type=float, default=0, help="Filter the isoforms by minimal TPM value.")
+    parser_rankAS.add_argument('-reads_freq', dest="reads_freq", type=float, default=0, help="Filter isoforms by the frequency of reads.")
+    parser_rankAS.add_argument('-read_support', dest="read_support", type=int, default=0, help="Filter isoforms by the count of reads.")
 
     parser_alleleAS = subparsers.add_parser('allele_as', help='Identify allele-related AS', usage='%(prog)s [options]')
     parser_alleleAS.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
