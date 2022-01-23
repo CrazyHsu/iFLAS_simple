@@ -217,7 +217,7 @@ def gz_file(fq_file,mode,level=6):
         if fq_file.endswith("gz"):
             fq_fp = gzip.open(fq_file,mode+"b",level)
         else:
-            sys.stderr.write("[INFO] read file '%s'\n"%fq_file)
+            # sys.stderr.write("[INFO] read file '%s'\n"%fq_file)
             fq_fp = file(fq_file,mode)
     except:
         sys.stderr.write("Error: Fail to IO file: %s\n"%(fq_file))
@@ -314,7 +314,7 @@ def calculate_potential(fasta, strand, output_orf, outfile):
     '''
     calculate the coding probability using LIBSVM
     '''
-    sys.stderr.write("[INFO] Predicting coding potential, please wait ...\n")
+    # sys.stderr.write("[INFO] Predicting coding potential, please wait ...\n")
 
     '''
         set directories and check depending tools existance
@@ -369,11 +369,11 @@ def calculate_potential(fasta, strand, output_orf, outfile):
         os.system('rm -f ' + outfile + '.tmp.1 ' + outfile + '.tmp.2 ' + outfile + '.tmp.out ' + outfile)
         rm_cmd = "rm -f " + outfile + '.feat'
         commands.getstatusoutput(rm_cmd)
-        sys.stderr.write("[INFO] Running Done!\n")
+        # sys.stderr.write("[INFO] Running Done!\n")
         return 0
-    else:
-        sys.stderr.write("[ERROR] Prediction error!\n")
-        return -1
+    # else:
+        # sys.stderr.write("[ERROR] Prediction error!\n")
+        # return -1
 
 
 def __main():

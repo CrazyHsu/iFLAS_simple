@@ -52,10 +52,11 @@ def getIsoTPM(quant_sf):
 
 def cpc2eval(longestIso):
     from CPC2 import calculate_potential
-    calculate_potential(longestIso, "+", 0, "cpc2out.txt")
+    calculate_potential(longestIso, "+", 0, "cpc2out")
     codingPotential = {}
     with open("cpc2out.txt") as f:
         for line in f.readlines():
+            if line.startswith("#"): continue
             infoList = line.strip().split("\t")
             isoId, coding_potential = infoList[0], infoList[-1]
             if isoId not in codingPotential:
@@ -139,7 +140,7 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
         print >> longestIsoOut, str(isoformBed[longestIso])
     longestIsoOut.close()
 
-    cmd = '''cut -f 1-12 longestIso.bed | bedtools getfasta -fi {} -bed - -name -split | seqkit replace -w 0 -p "(.*?):(.*)" -r '$1' > longestIso.fa'''.format(refParams.ref_genome)
+    cmd = '''cut -f 1-12 longestIso.bed | bedtools getfasta -fi {} -bed - -name -split -s | seqkit replace -w 0 -p "(.*?):(.*)" -r '$1' > longestIso.fa'''.format(refParams.ref_genome)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
     salmonIsoTMP = salmonQuant(dataObj, dirSpec)
@@ -149,7 +150,7 @@ def enumAsIsos(isoDict, isoformBed, collapsedTrans2reads, annoIsoformFile, dataO
     print >>isoEnumOut, "\t".join(["longestIso", "similarIsos", "junction", "gene", "annotation", "readSupport",
                                    "readsFreq", "minTPM", "maxTPM", "meanTPM", "coding_potential"])
     for junc in juncDict:
-        if set(juncDict[junc]["gene"]) != 1: continue
+        if len(set(juncDict[junc]["gene"])) != 1: continue
         longestIso = juncDict[junc]["longest"][0]
         similarIsos = ",".join(juncDict[junc]["iso"])
         gene = juncDict[junc]["gene"][0]
@@ -188,7 +189,7 @@ def filterIsos(isoEnumerate, isoformBed):
     # isoEnumerateNew.index = isoEnumerateNew.index.droplevel()
     isoInfoDict = {}
     with open(isoEnumerate) as f:
-        for line in f.readlines():
+        for line in f.readlines()[1:]:
             infoList = line.strip().split("\t")
             gene, longestIso, annotation, readSupport = infoList[3], infoList[0], infoList[4], int(infoList[5])
             if gene not in hqGeneDF.index: continue
@@ -248,4 +249,4 @@ def rank_iso(dataObj=None, dirSpec=None, refParams=None, rawDataObjs=None, optio
         from tissue_spec_iso import tissue_spec_iso
         tissue_spec_iso(dataObj, rawDataObjs, dirSpec, isoformBed, isoDict)
     os.chdir(prevDir)
-    print getCurrentTime() + " End finding high quality isoforms for project {} sample {}...!".format(projectName, sampleName)
+    print getCurrentTime() + " End finding high quality isoforms for project {} sample {}!".format(projectName, sampleName)

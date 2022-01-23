@@ -19,12 +19,12 @@ warnings.filterwarnings("ignore", category=RRuntimeWarning)
 
 def reportReadsCorrectedEval(dataObj=None, dirSpec=None):
     print getCurrentTime() + " Start plotting Reads Corrected Evaluation for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
-    filtrationDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "filtration")
-    if not validateDir(filtrationDir):
+    mappingDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mappingDir")
+    if not validateDir(mappingDir):
         print getCurrentTime() + " No Corrected Reads available used for evaluation for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
         return []
-    rawMappedBed = os.path.join(filtrationDir, "raw.mapped.addCVandID.bed12+")
-    correctMappedBed = os.path.join(filtrationDir, "mapped.addCVandID.bed12+")
+    rawMappedBed = os.path.join(mappingDir, "rawFlnc.addCVandID.bed12+")
+    correctMappedBed = os.path.join(mappingDir, "flnc.addCVandID.bed12+")
     basicStatisticsDir = os.path.join(os.getcwd(), "basicStatistics")
     resolveDir(basicStatisticsDir)
     from plotRscriptStrs import plotReadsCorrectedEvalStr
