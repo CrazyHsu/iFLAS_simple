@@ -69,7 +69,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                         pool.apply_async(visual_as, (dataObj, targetGenes, refParams, dirSpec))
                     if args.command == 'rank_iso':
                         from rank_iso import rank_iso
-                        # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
+                        # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams, args=args)
                         rawDataObjs = strain2data[proj][ref_strain][strain]
                         pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, args, rawDataObjs, optionTools))
 
@@ -139,7 +139,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
                 pool.apply_async(visual_as, (dataObj, targetGenes, refParams, dirSpec))
             if args.command == 'rank_iso':
                 from rank_iso import rank_iso
-                # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams)
+                # rank_iso(dataObj=dataObj, dirSpec=dirSpec, refParams=refParams, args=args)
                 pool.apply_async(rank_iso, (dataObj, dirSpec, refParams, args))
             if args.command == 'allele_as':
                 from allele_as import allele_as

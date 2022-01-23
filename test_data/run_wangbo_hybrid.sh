@@ -1,5 +1,5 @@
 python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py preproc -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg
-python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py mapping -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg -c -jcs 2
+python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py mapping -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg -jcs 2
 python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py collapse -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg
 python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py refine -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg -refine
 python /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/iflas.py find_as -cfg /data/CrazyHsu_data/Projects/isoseq/iFLAS_simple/test_data/test_pacbio_wangbo_hybrid.cfg

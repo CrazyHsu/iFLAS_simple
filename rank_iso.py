@@ -177,7 +177,7 @@ def filterIsos(isoEnumerate, isoformBed, args):
     # filter by salmon tpm
     isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["minTPM"] >= float(args.min_tpm)]
     # filter by reads frequency
-    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readsFreq"] >= float(args.read_freq)]
+    isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readsFreq"] >= float(args.reads_freq)]
     # filter by reads count
     isoEnumerateDF = isoEnumerateDF.loc[isoEnumerateDF["readSupport"] >= int(args.read_support)]
 
