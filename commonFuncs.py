@@ -7,7 +7,8 @@ Created on: 2022-01-18
 Last modified: 2022-01-18
 '''
 
-import os, re, datetime, psutil, subprocess, pysam
+import os, re, datetime, psutil, subprocess
+import pysam
 from Bio import SeqIO
 
 AStypes = ["IR", "SE", "A3SS", "A5SS"]

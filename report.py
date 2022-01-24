@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore", category=RRuntimeWarning)
 
 def reportReadsCorrectedEval(dataObj=None, dirSpec=None):
     print getCurrentTime() + " Start plotting Reads Corrected Evaluation for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
-    mappingDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mappingDir")
+    mappingDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping")
     if not validateDir(mappingDir):
         print getCurrentTime() + " No Corrected Reads available used for evaluation for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
         return []
@@ -79,11 +79,11 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
     cmd = '''boxes.R -ng -no *.lst -p=LengthDistribution.box.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
 
-    dataObj.ngsJunctions = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "rna-seq", "reassembly", "junctions.bed")
-    if os.path.exists(dataObj.ngsJunctions):
+    dataObj.ngs_junctions = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "rna-seq", "reassembly", "junctions.bed")
+    if os.path.exists(dataObj.ngs_junctions):
         isoformBed = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "refine", "isoformGrouped.bed12+")
         cmd = '''awk '$10>1' {} | bed2gpe.pl | transSupportByJunction.pl -j {} >supportedByRNAseq.tsv 2>supportedByRNAseq.summary'''.format(
-            isoformBed, dataObj.ngsJunctions)
+            isoformBed, dataObj.ngs_junctions)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
         cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=12 -p=supportedByRNAseq.pdf'''
         subprocess.call(cmd, shell=True, executable="/bin/bash")
