@@ -25,11 +25,13 @@ def reportReadsCorrectedEval(dataObj=None, dirSpec=None):
         return []
     rawMappedBed = os.path.join(mappingDir, "rawFlnc.addCVandID.bed12+")
     correctMappedBed = os.path.join(mappingDir, "flnc.addCVandID.bed12+")
-    basicStatisticsDir = os.path.join(os.getcwd(), "basicStatistics")
+    currDir = os.getcwd()
+    basicStatisticsDir = os.path.join(currDir, "basicStatistics")
     resolveDir(basicStatisticsDir)
     from plotRscriptStrs import plotReadsCorrectedEvalStr
     robjects.r(plotReadsCorrectedEvalStr)
     robjects.r.plotReadsCorrectedEval(rawMappedBed, correctMappedBed, "readsCorrectResult.pdf")
+    os.chdir(currDir)
     print getCurrentTime() + " Plotting Reads Corrected Evaluation for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
     return ["readsCorrectResult.pdf"]
 
@@ -59,7 +61,8 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
             print getCurrentTime() + " No Reads Content can be evaluated for project {} sample {}...".format(dataObj.project_name, dataObj.sample_name)
             return []
 
-    basicStatisticsDir = os.path.join(os.getcwd(), "basicStatistics")
+    currDir = os.getcwd()
+    basicStatisticsDir = os.path.join(currDir, "basicStatistics")
     resolveDir(basicStatisticsDir)
     cmd = "seqkit fx2tab -n -g {} | cut -f 1,2 > GC_of_raw_flnc_reads.log".format(flncFx)
     subprocess.call(cmd, shell=True)
@@ -87,6 +90,7 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
         subprocess.call(cmd, shell=True, executable="/bin/bash")
         cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=12 -p=supportedByRNAseq.pdf'''
         subprocess.call(cmd, shell=True, executable="/bin/bash")
+    os.chdir(currDir)
     print getCurrentTime() + " Plotting Reads Content Evaluation for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)
     return ["GC_of_raw_flnc_reads.pdf", "GC_across_raw_flnc_read.pdf", "LengthDistribution.curve.pdf", "LengthDistribution.box.pdf"]
 

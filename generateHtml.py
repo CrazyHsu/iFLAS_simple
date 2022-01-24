@@ -694,7 +694,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
 
         if os.path.exists(os.path.join(subReportDir, "asPattern")):
             asAnnoPdf = convertPdf2png(inPdf=os.path.join(subReportDir, "asPattern", "{}_{}.AS_annotation.pdf".format(projectName, sampleName)))
-            asSpliceSitePdf = convertPdf2png(inPdf=os.path.join(subReportDir, "{}_{}.AS_spliceSite.pdf".format(projectName, sampleName)))
+            asSpliceSitePdf = convertPdf2png(inPdf=os.path.join(subReportDir, "asPattern", "{}_{}.AS_spliceSite.pdf".format(projectName, sampleName)))
             fileDiscription = ""
             resultDict[sampleName]["basicStatistics"]["asPattern"] = {"asAnno": [fileDiscription, asAnnoPdf]}
             fileDiscription = ""
