@@ -88,7 +88,7 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
         cmd = '''awk '$10>1' {} | bed2gpe.pl | transSupportByJunction.pl -j {} >supportedByRNAseq.tsv 2>supportedByRNAseq.summary'''.format(
             isoformBed, dataObj.ngs_junctions)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
-        cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=12 -p=supportedByRNAseq.pdf'''
+        cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=12 -p=supportedByRNAseq.pdf 2>/dev/null'''
         subprocess.call(cmd, shell=True, executable="/bin/bash")
     os.chdir(currDir)
     print getCurrentTime() + " Plotting Reads Content Evaluation for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)

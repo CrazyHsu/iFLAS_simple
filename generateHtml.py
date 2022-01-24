@@ -15,10 +15,18 @@ import os, argparse, glob, subprocess
 from distutils.dir_util import copy_tree
 from yattag import Doc, indent
 from collections import Counter
-from commonFuncs import validateFile, resolveDir, makeLink
+from commonFuncs import *
 
 
 ################# Functions ##################
+def getRelPath(myPath, targetPath=None, targetDir=None):
+    if targetPath and targetDir: return
+    if targetPath:
+        targetDir = os.path.dirname(targetPath)
+        return os.path.relpath(myPath, targetDir)
+    if targetDir:
+        return os.path.relpath(myPath, targetDir)
+
 def column2breakPoint(colName, tableType="AS"):
     if tableType == "AS":
         myDict = {"ID": "all", "GeneID": "xs", "geneSymbol": "all", "chr": "all", "strand": "all",
@@ -39,94 +47,118 @@ def column2breakPoint(colName, tableType="AS"):
 
 def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None):
     if validateFile(isoformStrucFile):
+        curDir = os.path.dirname(".")
         line("h1", "The isoform structure in " + gene)
+        isoformStrucFile = getRelPath(isoformStrucFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=isoformStrucFile)
 
 
 def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None):
     if validateFile(alleleAsFile):
+        curDir = os.path.dirname(".")
         line("h1", "Allele-specific Alternative splicing")
+        alleleAsFile = getRelPath(alleleAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=alleleAsFile)
 
 
 def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None):
     if validateFile(paTailLenAsFile):
+        curDir = os.path.dirname(".")
         line("h1", "AS-related poly(A) tail length differential")
+        paTailLenAsFile = getRelPath(paTailLenAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenAsFile)
 
 
 def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None):
     if validateFile(paTailLenApaFile):
+        curDir = os.path.dirname(".")
         line("h1", "APA-related poly(A) tail length differential")
+        paTailLenApaFile = getRelPath(paTailLenApaFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenApaFile)
 
 
 def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None):
     if validateFile(diffAsPlot):
         with tag("div", klass="col"):
+            curDir = os.path.dirname(".")
             line("h1", "Differential alternative splicing pattern distribution")
+            diffAsPlot = getRelPath(diffAsPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=diffAsPlot)
 
 
 def goEnrichmentBlock(goEnrichPlot, doc=None, tag=None, line=None):
     if validateFile(goEnrichPlot):
         with tag("div", klass="col"):
+            curDir = os.path.dirname(".")
             line("h1", "GO enrichment of the differential alternative spliced genes")
+            goEnrichPlot = getRelPath(goEnrichPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=goEnrichPlot)
 
 
 def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None):
+    curDir = os.path.dirname(".")
     if "readsCorrection" in basicStatisticsDict:
         readsCorrPlot = basicStatisticsDict["readsCorrection"][1]
         if validateFile(readsCorrPlot):
             with tag("div", klass="col-md-6"):
                 line("h3", "The evaluation of reads before and after correction")
+                readsCorrPlot = getRelPath(readsCorrPlot, targetDir=curDir)
                 doc.stag("img", klass="img-responsive", src=readsCorrPlot)
     if "juncSupported" in basicStatisticsDict:
         juncSupportPlot = basicStatisticsDict["juncSupported"][1]
         if validateFile(juncSupportPlot):
             with tag("div", klass="col-md-6"):
                 line("h3", "The junctions of full-length reads supported by NGS reads")
+                juncSupportPlot = getRelPath(juncSupportPlot, targetDir=curDir)
                 doc.stag("img", klass="img-responsive", src=juncSupportPlot)
 
 
 def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None):
+    curDir = os.path.dirname(".")
     if "GC_of_raw_flnc" in basicStatisticsDict:
         gcInFlncPlot = basicStatisticsDict["GC_of_raw_flnc"][1]
         if validateFile(gcInFlncPlot):
             with tag("div", klass="col-md-6"):
                 line("h3", "The GC content of flnc reads")
+                gcInFlncPlot = getRelPath(gcInFlncPlot, targetDir=curDir)
                 doc.stag("img", klass="img-responsive", src=gcInFlncPlot)
     if "GC_across_raw_flnc" in basicStatisticsDict:
         gcAcrossFlncPlot = basicStatisticsDict["GC_across_raw_flnc"][1]
         if validateFile(gcAcrossFlncPlot):
             with tag("div", klass="col-md-6"):
                 line("h3", "The GC content across flnc reads")
+                gcAcrossFlncPlot = getRelPath(gcAcrossFlncPlot, targetDir=curDir)
                 doc.stag("img", klass="img-responsive", src=gcAcrossFlncPlot)
 
 
 def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None):
+    curDir = os.path.dirname(".")
     annotationPlot = basicStatisticsDict["asPattern"]["asAnno"][1]
     spliceSitePlot = basicStatisticsDict["asPattern"]["asSpliceSite"][1]
     if validateFile(annotationPlot):
         with tag("div", klass="col-md-6"):
             line("h3", "The alternative splicing(AS) summary")
+            annotationPlot = getRelPath(annotationPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=annotationPlot)
     if validateFile(spliceSitePlot):
         with tag("div", klass="col-md-6"):
             line("h3", "The splice-site of alternative splicing(AS)")
+            spliceSitePlot = getRelPath(spliceSitePlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=spliceSitePlot)
 
 def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None):
+    curDir = os.path.dirname(".")
     lenDistBox = basicStatisticsDict["LengthDistribution"][1]
     lenDistCurve = basicStatisticsDict["LengthDistribution"][2]
     if validateFile(lenDistBox):
         with tag("div", klass="col-md-6"):
             line("h3", "The length distribution (box) of full-length reads")
+            lenDistBox = getRelPath(lenDistBox, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=lenDistBox)
     if validateFile(lenDistCurve):
         with tag("div", klass="col-md-6"):
             line("h3", "The length distribution (curve) of full-length reads")
+            lenDistCurve = getRelPath(lenDistCurve, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=lenDistCurve)
 
 
@@ -185,7 +217,7 @@ def generateMainPage(reportDict):
                                 Furthermore, iFLAS can generate rich graphical plots and comprehensive summary report, making it easy-to-use for researchers.
                                 Below is the workflow of iFLAS.
                             '''
-                            with tag("p"):
+                            with tag("h3"):
                                 text(description)
                             workflow_png = "assets/src/iFLAS_workflow.png"
                             doc.stag("img", klass="img-responsive", src=workflow_png)
@@ -747,7 +779,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 else:
                     resultDict[sampleName]["gene"][gene]["palenAPA"].append(plotPath)
 
-    mergedGeneStrucDir = os.path.join(reportDir, "isoViewer_sample_merged")
+    mergedGeneStrucDir = os.path.join(dirSpec.out_dir, "isoViewer_sample_merged")
     if os.path.exists(mergedGeneStrucDir):
         mergedGeneStrucReportDir = os.path.join(reportDir, "allSampleMergedGeneStrucPlots")
         resultDict.update({"allSampleMerged": {}})
@@ -756,7 +788,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
             plotPath = convertPdf2png(inPdf=os.path.join(i, "{}.pdf".format(gene)), outDir=mergedGeneStrucReportDir)
             resultDict["allSampleMerged"].update({gene: plotPath})
 
-    dasReportDir = os.path.join(reportDir, "das")
+    dasReportDir = os.path.join(dirSpec.out_dir, "das")
     if os.path.exists(dasReportDir):
         dasDir = os.path.join(dirSpec.out_dir, "das")
         validAsType = ["IR", "SE", "A3SS", "A5SS"]
@@ -800,6 +832,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
 
 def generateHtml(dataToProcess, dirSpec, optionTools, args):
     # resolveDir(iflasOut)
+    print getCurrentTime() + " Start generating html report..."
     resultDict = retrieveResults(dataToProcess, dirSpec, optionTools, args)
     htmlOut = os.path.join(dirSpec.out_dir, "reports", "html")
     # htmlOut = "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/iflas_html_test"
@@ -833,4 +866,6 @@ def generateHtml(dataToProcess, dirSpec, optionTools, args):
     generateSingleSampleGenePage(resultDict)
     if "das" in resultDict:
         generateDasPage(resultDict)
+
+    print getCurrentTime() + " End generating html report!"
 
