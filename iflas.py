@@ -272,7 +272,7 @@ if __name__ == "__main__":
     parser_goAS.add_argument('-s', dest="sampleName", type=str, help="The sample name used plot the track, multi-sample should be separated by commma used for GO enrichment analysis.")
     parser_goAS.add_argument('-o', dest="outName", type=str, default="goEnrichment", help="The prefix of the GO enrichment output file.")
 
-    parser_report = subparsers.add_parser('report', parents=[parent_parser], help='Automatic detect the plots generated in each step, and merge them into a report file', usage='%(prog)s [options]')
+    parser_report = subparsers.add_parser('report', parents=[parent_parser, go_parser], help='Automatic detect the plots generated in each step, and merge them into a report file', usage='%(prog)s [options]')
     # parser_report.add_argument('-cfg', dest="default_cfg", help="The config file used for init setting.")
     parser_report.add_argument('-all', dest="all", action="store_true", default=False, help="Generate all the plots.")
     parser_report.add_argument('-basic', dest="basic", action="store_true", default=False, help="Generate basic information plots.")

@@ -47,7 +47,7 @@ def column2breakPoint(colName, tableType="AS"):
 
 def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None):
     if validateFile(isoformStrucFile):
-        curDir = os.path.dirname(".")
+        curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "The isoform structure in " + gene)
         isoformStrucFile = getRelPath(isoformStrucFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=isoformStrucFile)
@@ -55,7 +55,7 @@ def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None):
 
 def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None):
     if validateFile(alleleAsFile):
-        curDir = os.path.dirname(".")
+        curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "Allele-specific Alternative splicing")
         alleleAsFile = getRelPath(alleleAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=alleleAsFile)
@@ -63,7 +63,7 @@ def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None):
 
 def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None):
     if validateFile(paTailLenAsFile):
-        curDir = os.path.dirname(".")
+        curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "AS-related poly(A) tail length differential")
         paTailLenAsFile = getRelPath(paTailLenAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenAsFile)
@@ -71,7 +71,7 @@ def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None):
 
 def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None):
     if validateFile(paTailLenApaFile):
-        curDir = os.path.dirname(".")
+        curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "APA-related poly(A) tail length differential")
         paTailLenApaFile = getRelPath(paTailLenApaFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenApaFile)
@@ -80,7 +80,7 @@ def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None):
 def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None):
     if validateFile(diffAsPlot):
         with tag("div", klass="col"):
-            curDir = os.path.dirname(".")
+            curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "Differential alternative splicing pattern distribution")
             diffAsPlot = getRelPath(diffAsPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=diffAsPlot)
@@ -89,14 +89,14 @@ def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None):
 def goEnrichmentBlock(goEnrichPlot, doc=None, tag=None, line=None):
     if validateFile(goEnrichPlot):
         with tag("div", klass="col"):
-            curDir = os.path.dirname(".")
+            curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "GO enrichment of the differential alternative spliced genes")
             goEnrichPlot = getRelPath(goEnrichPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=goEnrichPlot)
 
 
 def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(".")
+    curDir = os.path.dirname(os.path.abspath("."))
     if "readsCorrection" in basicStatisticsDict:
         readsCorrPlot = basicStatisticsDict["readsCorrection"][1]
         if validateFile(readsCorrPlot):
@@ -114,7 +114,7 @@ def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None):
 
 
 def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(".")
+    curDir = os.path.dirname(os.path.abspath("."))
     if "GC_of_raw_flnc" in basicStatisticsDict:
         gcInFlncPlot = basicStatisticsDict["GC_of_raw_flnc"][1]
         if validateFile(gcInFlncPlot):
@@ -132,7 +132,7 @@ def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None):
 
 
 def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(".")
+    curDir = os.path.dirname(os.path.abspath("."))
     annotationPlot = basicStatisticsDict["asPattern"]["asAnno"][1]
     spliceSitePlot = basicStatisticsDict["asPattern"]["asSpliceSite"][1]
     if validateFile(annotationPlot):
@@ -147,7 +147,7 @@ def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None):
             doc.stag("img", klass="img-responsive", src=spliceSitePlot)
 
 def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(".")
+    curDir = os.path.dirname(os.path.abspath("."))
     lenDistBox = basicStatisticsDict["LengthDistribution"][1]
     lenDistCurve = basicStatisticsDict["LengthDistribution"][2]
     if validateFile(lenDistBox):
@@ -782,6 +782,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
     mergedGeneStrucDir = os.path.join(dirSpec.out_dir, "isoViewer_sample_merged")
     if os.path.exists(mergedGeneStrucDir):
         mergedGeneStrucReportDir = os.path.join(reportDir, "allSampleMergedGeneStrucPlots")
+        resolveDir(mergedGeneStrucReportDir, chdir=False)
         resultDict.update({"allSampleMerged": {}})
         for i in glob.glob(os.path.join(mergedGeneStrucDir, "*")):
             gene = os.path.basename(i)
