@@ -96,7 +96,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
             from diff_as import diff_as
             # diff_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
             compCond = args.compCond
-            diff_as(sampleMergedToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=True)
+            diff_as(sampleMergedToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=True, args=args, optionTools=optionTools)
         if args.command == 'go':
             from go import go
             go(args, optionTools=optionTools, dirSpec=dirSpec)
@@ -162,7 +162,7 @@ def splitCommandRun(args, dataToProcess, refInfoParams, dirSpec, ccsParams, mini
             from diff_as import diff_as
             # diff_as(dataObj=dataObj, refParams=refParams, dirSpec=dirSpec)
             compCond = args.compCond
-            diff_as(dataToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=False)
+            diff_as(dataToProcess, compCondFile=compCond, dirSpec=dirSpec, sampleMerged=False, args=args, optionTools=optionTools)
         if args.command == 'go':
             from go import go
             go(args, optionTools=optionTools, dirSpec=dirSpec)

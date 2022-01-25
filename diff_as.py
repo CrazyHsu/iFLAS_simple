@@ -142,7 +142,7 @@ def mergeIsoforms(samples=None, dirSpec=None):
     return os.path.join(os.getcwd(), "all_sample_merged_iso.bed")
 
 
-def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False):
+def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, args=None, optionTools=None):
     print getCurrentTime() + " Identify differential alternative spliced isoforms..."
     if validateFile(compCondFile):
         compCondFile = os.path.abspath(compCondFile)
@@ -200,10 +200,38 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False):
         seDiff = seDiff.loc[seDiff.FDR <= 0.05]
         a3ssDiff = a3ssDiff.loc[a3ssDiff.FDR <= 0.05]
         a5ssDiff = a5ssDiff.loc[a5ssDiff.FDR <= 0.05]
-        irDiff.to_csv("{}.sigDiffAS/IR.sig.txt".format(compOutDir), sep="\t", header=True, index=False)
-        seDiff.to_csv("{}.sigDiffAS/SE.sig.txt".format(compOutDir), sep="\t", header=True, index=False)
-        a3ssDiff.to_csv("{}.sigDiffAS/A3SS.sig.txt".format(compOutDir), sep="\t", header=True, index=False)
-        a5ssDiff.to_csv("{}.sigDiffAS/A5SS.sig.txt".format(compOutDir), sep="\t", header=True, index=False)
+
+        sigIRfile = "{}.sigDiffAS/IR.sig.txt".format(compOutDir)
+        sigSEfile = "{}.sigDiffAS/SE.sig.txt".format(compOutDir)
+        sigA3SSfile = "{}.sigDiffAS/A3SS.sig.txt".format(compOutDir)
+        sigA5SSfile = "{}.sigDiffAS/A5SS.sig.txt".format(compOutDir)
+
+        irDiff.to_csv(sigIRfile, sep="\t", header=True, index=False)
+        seDiff.to_csv(sigSEfile, sep="\t", header=True, index=False)
+        a3ssDiff.to_csv(sigA3SSfile, sep="\t", header=True, index=False)
+        a5ssDiff.to_csv(sigA5SSfile, sep="\t", header=True, index=False)
+
+        if args.go:
+            tmpSigAsFiles = [sigIRfile, sigSEfile, sigA3SSfile, sigA5SSfile]
+            cmd = "cat {} | grep -v 'ID' | cut -f 2 | sort -u > {}.sigDiffAS/dasg.lst".format(" ".join(tmpSigAsFiles), compOutDir)
+            subprocess.call(cmd, shell=True)
+            from plotRscriptStrs import plotTargetGenesGoEnrichmentStr
+            # outName = compPair
+            gene2goFile = args.gene2goFile if args.gene2goFile else optionTools.gene2go
+            if not gene2goFile:
+                print "You don't provide gene2go file, the GO enrichment will not be carried out!"
+                continue
+
+            from rpy2 import robjects
+            from rpy2.rinterface import RRuntimeWarning
+            warnings.filterwarnings("ignore", category=RRuntimeWarning)
+            robjects.r(plotTargetGenesGoEnrichmentStr)
+            robjects.r.plotTargetGenesGoEnrichment("dasg.lst", compOutDir, gene2goFile, "sigDiff", float(args.cutoff),
+                                                   args.filterBy, int(args.showCategory))
+        # enrichResult = os.path.abspath("sigDiff.goEnrichResults.txt")
+        # enrichPlot = convertPdf2png(inPdf=os.path.abspath(outName + ".pdf"))
+        # resultDict["das"][compPair].update({"goEnrichResults": enrichResult})
+        # resultDict["das"][compPair].update({"goEnrichPlot": enrichPlot})
 
     os.chdir(prevDir)
     print getCurrentTime() + " Identify differential alternative spliced isoforms done!"
