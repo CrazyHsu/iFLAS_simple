@@ -239,10 +239,10 @@ def palen_as(dataObj=None, refParams=None, dirSpec=None, filterByCount=10, dataT
     isoformFile = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
     collapsedTrans2reads = getDictFromFile(collapsedGroupFile, sep="\t", inlineSep=",", valueCol=2)
 
-    irFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "IR.confident.bed6+")
-    seFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "SE.confident.bed12+")
-    a3ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "A3SS.confident.bed6+")
-    a5ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "A5SS.confident.bed6+")
+    irFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "IR.confident.bed6+")
+    seFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "SE.confident.bed12+")
+    a3ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "A3SS.confident.bed6+")
+    a5ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "A5SS.confident.bed6+")
 
     seAsPairs = getASpairedIsoforms(seFile, collapsedGroupFile, isoformFile, asType="SE", mergeByJunc=True)
     irAsPairs = getASpairedIsoforms(irFile, collapsedGroupFile, isoformFile, asType="IR", mergeByJunc=True)

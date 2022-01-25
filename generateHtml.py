@@ -45,58 +45,58 @@ def column2breakPoint(colName, tableType="AS"):
     return myDict[colName]
 
 
-def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None):
+def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None, curDir=None):
     if validateFile(isoformStrucFile):
-        curDir = os.path.dirname(os.path.abspath("."))
+        # curDir = os.getcwd()
         line("h1", "The isoform structure in " + gene)
         isoformStrucFile = getRelPath(isoformStrucFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=isoformStrucFile)
 
 
-def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None):
+def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(alleleAsFile):
-        curDir = os.path.dirname(os.path.abspath("."))
+        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "Allele-specific Alternative splicing")
         alleleAsFile = getRelPath(alleleAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=alleleAsFile)
 
 
-def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None):
+def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(paTailLenAsFile):
-        curDir = os.path.dirname(os.path.abspath("."))
+        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "AS-related poly(A) tail length differential")
         paTailLenAsFile = getRelPath(paTailLenAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenAsFile)
 
 
-def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None):
+def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(paTailLenApaFile):
-        curDir = os.path.dirname(os.path.abspath("."))
+        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "APA-related poly(A) tail length differential")
         paTailLenApaFile = getRelPath(paTailLenApaFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenApaFile)
 
 
-def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None):
+def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None, curDir=None):
     if validateFile(diffAsPlot):
         with tag("div", klass="col"):
-            curDir = os.path.dirname(os.path.abspath("."))
+            # curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "Differential alternative splicing pattern distribution")
             diffAsPlot = getRelPath(diffAsPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=diffAsPlot)
 
 
-def goEnrichmentBlock(goEnrichPlot, doc=None, tag=None, line=None):
+def goEnrichmentBlock(goEnrichPlot, doc=None, tag=None, line=None, curDir=None):
     if validateFile(goEnrichPlot):
         with tag("div", klass="col"):
-            curDir = os.path.dirname(os.path.abspath("."))
+            # curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "GO enrichment of the differential alternative spliced genes")
             goEnrichPlot = getRelPath(goEnrichPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=goEnrichPlot)
 
 
-def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(os.path.abspath("."))
+def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
+    # curDir = os.path.dirname(os.path.abspath("."))
     if "readsCorrection" in basicStatisticsDict:
         readsCorrPlot = basicStatisticsDict["readsCorrection"][1]
         if validateFile(readsCorrPlot):
@@ -113,8 +113,8 @@ def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None):
                 doc.stag("img", klass="img-responsive", src=juncSupportPlot)
 
 
-def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(os.path.abspath("."))
+def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
+    # curDir = os.path.dirname(os.path.abspath("."))
     if "GC_of_raw_flnc" in basicStatisticsDict:
         gcInFlncPlot = basicStatisticsDict["GC_of_raw_flnc"][1]
         if validateFile(gcInFlncPlot):
@@ -131,8 +131,8 @@ def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None):
                 doc.stag("img", klass="img-responsive", src=gcAcrossFlncPlot)
 
 
-def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(os.path.abspath("."))
+def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
+    # curDir = os.path.dirname(os.path.abspath("."))
     annotationPlot = basicStatisticsDict["asPattern"]["asAnno"][1]
     spliceSitePlot = basicStatisticsDict["asPattern"]["asSpliceSite"][1]
     if validateFile(annotationPlot):
@@ -146,8 +146,8 @@ def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None):
             spliceSitePlot = getRelPath(spliceSitePlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=spliceSitePlot)
 
-def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None):
-    curDir = os.path.dirname(os.path.abspath("."))
+def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
+    # curDir = os.path.dirname(os.path.abspath("."))
     lenDistBox = basicStatisticsDict["LengthDistribution"][1]
     lenDistCurve = basicStatisticsDict["LengthDistribution"][2]
     if validateFile(lenDistBox):
@@ -353,7 +353,9 @@ def generateAllSampleMergedPage(reportDict):
                     with tag("div", klass="container"):
                         with tag("div", klass="row"):
                             with tag("div", klass="col"):
-                                geneStrucBlock(reportDict["allSampleMerged"][gene], gene=gene, doc=doc, line=line)
+                                curDir = os.path.join(os.getcwd(), "allSampleMerged")
+                                geneStrucBlock(reportDict["allSampleMerged"][gene], gene=gene, doc=doc, line=line,
+                                               curDir=curDir)
 
                 line("script", "", src="../assets/js/jquery.min.js")
                 line("script", "", src="../assets/js/bootstrap.min.js")
@@ -380,6 +382,7 @@ def generateDasPage(reportDict):
     for tmpSample in reportDict["das"]:
         dasDict = reportDict["das"][tmpSample]
         resolveDir("das", chdir=False)
+        curDir = os.path.join(os.getcwd(), "das")
         out = open(os.path.join("das", tmpSample + ".html"), "w")
         doc, tag, text, line = Doc().ttl()
         doc.asis('<!DOCTYPE html>')
@@ -405,7 +408,7 @@ def generateDasPage(reportDict):
                     with tag("div", klass="container"):
                         if "dasDistribution" in dasDict:
                             with tag("div", klass="row"):
-                                diffAsBlock(dasDict["dasDistribution"], doc=doc, tag=tag, line=line)
+                                diffAsBlock(dasDict["dasDistribution"], doc=doc, tag=tag, line=line, curDir=curDir)
                         line("h1", "Differential alternative spliced events by categories")
                         if "IR" in dasDict:
                             asType = "ir"
@@ -449,7 +452,7 @@ def generateDasPage(reportDict):
                                     generateTable(dasDict["A3SS"], tableType="AS", doc=doc, tag=tag, text=text, line=line)
                         if "goEnrichPlot" in dasDict:
                             with tag("div", klass="row"):
-                                goEnrichmentBlock(dasDict["goEnrichPlot"], doc=doc, tag=tag, line=line)
+                                goEnrichmentBlock(dasDict["goEnrichPlot"], doc=doc, tag=tag, line=line, curDir=curDir)
                         if "goEnrichResults" in dasDict:
                             line("h1", "GO enrichment results of the differential alternative spliced genes")
                             with tag("div", ("class", "row")):
@@ -493,6 +496,7 @@ def generateSingleSampleStatisticsPage(reportDict):
         if "basicStatistics" not in reportDict[tmpSample]: continue
         basicStatisticsDict = reportDict[tmpSample]["basicStatistics"]
         resolveDir(tmpSample, chdir=False)
+        curDir = os.path.join(os.getcwd(), tmpSample)
         out = open(os.path.join(tmpSample, "basicStatistics.html"), "w")
         doc, tag, text, line = Doc().ttl()
         doc.asis('<!DOCTYPE html>')
@@ -518,16 +522,16 @@ def generateSingleSampleStatisticsPage(reportDict):
                     with tag("div", klass="container"):
                         if "readsCorrection" in basicStatisticsDict or "juncSupported" in basicStatisticsDict:
                             with tag("div", klass="row"):
-                                readsCorrAndJuncBlock(basicStatisticsDict, doc=doc, tag=tag, line=line)
+                                readsCorrAndJuncBlock(basicStatisticsDict, doc=doc, tag=tag, line=line, curDir=curDir)
                         if "GC_of_raw_flnc" in basicStatisticsDict or "GC_across_raw_flnc" in basicStatisticsDict:
                             with tag("div", klass="row"):
-                                gcContentBlock(basicStatisticsDict, doc=doc, tag=tag, line=line)
+                                gcContentBlock(basicStatisticsDict, doc=doc, tag=tag, line=line, curDir=curDir)
                         if "LengthDistribution" in basicStatisticsDict:
                             with tag("div", klass="row"):
-                                lengthDistributionBlock(basicStatisticsDict, doc=doc, tag=tag, line=line)
+                                lengthDistributionBlock(basicStatisticsDict, doc=doc, tag=tag, line=line, curDir=curDir)
                         if "asPattern" in basicStatisticsDict:
                             with tag("div", klass="row"):
-                                asPatternBlock(basicStatisticsDict, doc=doc, tag=tag, line=line)
+                                asPatternBlock(basicStatisticsDict, doc=doc, tag=tag, line=line, curDir=curDir)
 
                 line("script", "", src="../assets/js/jquery.min.js")
                 line("script", "", src="../assets/js/bootstrap.min.js")
@@ -561,6 +565,7 @@ def generateSingleSampleGenePage(reportDict):
         if "genes" not in reportDict[tmpSample]: continue
         for gene in reportDict[tmpSample]["genes"]:
             resolveDir(tmpSample, chdir=False)
+            curDir = os.path.join(os.getcwd(), tmpSample)
             out = open(os.path.join(tmpSample, gene + ".html"), "w")
             doc, tag, text, line = Doc().ttl()
             doc.asis('<!DOCTYPE html>')
@@ -587,22 +592,22 @@ def generateSingleSampleGenePage(reportDict):
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
                                         geneStrucBlock(reportDict[tmpSample]["genes"][gene]["isoformStruc"], gene=gene,
-                                                       doc=doc, line=line)
+                                                       doc=doc, line=line, curDir=curDir)
                             if "alleleAS" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
                                         alleleAsBlock(reportDict[tmpSample]["genes"][gene]["alleleAS"], doc=doc,
-                                                      tag=tag, line=line)
+                                                      tag=tag, line=line, curDir=curDir)
                             if "palenAsPlots" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
                                         paTailLenAsBlock(reportDict[tmpSample]["genes"][gene]["palenAsPlots"], doc=doc,
-                                                         tag=tag, line=line)
+                                                         tag=tag, line=line, curDir=curDir)
                             if "palenAPA" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
                                         paTailLenApaBlock(reportDict[tmpSample]["genes"][gene]["palenAPA"], doc=doc,
-                                                          tag=tag, line=line)
+                                                          tag=tag, line=line, curDir=curDir)
 
                     line("script", "", src="../assets/js/jquery.min.js")
                     line("script", "", src="../assets/js/bootstrap.min.js")
