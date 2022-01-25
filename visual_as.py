@@ -22,7 +22,7 @@ class MainSection(object):
         self.legend      = getAttribute("legend", True, **args)
         self.width       = getAttribute("width", 10.0, **args)
         self.height      = getAttribute("height", 11.0, **args)
-        self.fontsize    = getAttribute("fontsize", 4, **args)
+        self.fontsize    = getAttribute("fontsize", 6, **args)
         self.output_file = getAttribute("fout", None, **args)
         self.shrink_introns = getAttribute("shrink_introns", False, **args)
 

@@ -47,7 +47,6 @@ def column2breakPoint(colName, tableType="AS"):
 
 def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None, curDir=None):
     if validateFile(isoformStrucFile):
-        # curDir = os.getcwd()
         line("h1", "The isoform structure in " + gene)
         isoformStrucFile = getRelPath(isoformStrucFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=isoformStrucFile)
@@ -55,7 +54,6 @@ def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None, curDir=None):
 
 def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(alleleAsFile):
-        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "Allele-specific Alternative splicing")
         alleleAsFile = getRelPath(alleleAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=alleleAsFile)
@@ -63,7 +61,6 @@ def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None, curDir=None):
 
 def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(paTailLenAsFile):
-        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "AS-related poly(A) tail length differential")
         paTailLenAsFile = getRelPath(paTailLenAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenAsFile)
@@ -71,7 +68,6 @@ def paTailLenAsBlock(paTailLenAsFile, doc=None, tag=None, line=None, curDir=None
 
 def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(paTailLenApaFile):
-        # curDir = os.path.dirname(os.path.abspath("."))
         line("h1", "APA-related poly(A) tail length differential")
         paTailLenApaFile = getRelPath(paTailLenApaFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=paTailLenApaFile)
@@ -80,7 +76,6 @@ def paTailLenApaBlock(paTailLenApaFile, doc=None, tag=None, line=None, curDir=No
 def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None, curDir=None):
     if validateFile(diffAsPlot):
         with tag("div", klass="col"):
-            # curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "Differential alternative splicing pattern distribution")
             diffAsPlot = getRelPath(diffAsPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=diffAsPlot)
@@ -89,14 +84,12 @@ def diffAsBlock(diffAsPlot, doc=None, tag=None, line=None, curDir=None):
 def goEnrichmentBlock(goEnrichPlot, doc=None, tag=None, line=None, curDir=None):
     if validateFile(goEnrichPlot):
         with tag("div", klass="col"):
-            # curDir = os.path.dirname(os.path.abspath("."))
             line("h1", "GO enrichment of the differential alternative spliced genes")
             goEnrichPlot = getRelPath(goEnrichPlot, targetDir=curDir)
             doc.stag("img", klass="img-responsive", src=goEnrichPlot)
 
 
 def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
-    # curDir = os.path.dirname(os.path.abspath("."))
     if "readsCorrection" in basicStatisticsDict:
         readsCorrPlot = basicStatisticsDict["readsCorrection"][1]
         if validateFile(readsCorrPlot):
@@ -114,7 +107,6 @@ def readsCorrAndJuncBlock(basicStatisticsDict, doc=None, tag=None, line=None, cu
 
 
 def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
-    # curDir = os.path.dirname(os.path.abspath("."))
     if "GC_of_raw_flnc" in basicStatisticsDict:
         gcInFlncPlot = basicStatisticsDict["GC_of_raw_flnc"][1]
         if validateFile(gcInFlncPlot):
@@ -132,7 +124,6 @@ def gcContentBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=No
 
 
 def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
-    # curDir = os.path.dirname(os.path.abspath("."))
     annotationPlot = basicStatisticsDict["asPattern"]["asAnno"][1]
     spliceSitePlot = basicStatisticsDict["asPattern"]["asSpliceSite"][1]
     if validateFile(annotationPlot):
@@ -147,7 +138,6 @@ def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=No
             doc.stag("img", klass="img-responsive", src=spliceSitePlot)
 
 def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
-    # curDir = os.path.dirname(os.path.abspath("."))
     lenDistBox = basicStatisticsDict["LengthDistribution"][1]
     lenDistCurve = basicStatisticsDict["LengthDistribution"][2]
     if validateFile(lenDistBox):
@@ -811,26 +801,26 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                     makeLink(j, os.path.join(dasReportDir, compPair, os.path.basename(j)))
                     tmpSigAsFiles.append(os.path.join(dasReportDir, compPair, os.path.basename(j)))
                     resultDict["das"][compPair].update({asType: j})
-                asDistribution = convertPdf2png(inPdf=os.path.join(i, "sigDiff.AS_distribution.pdf"), outDir=os.path.join(dasReportDir, compPair))
-                resultDict["das"][compPair].update({"asDistribution": asDistribution})
+                dasDistribution = convertPdf2png(inPdf=os.path.join(i, "sigDiff.AS_distribution.pdf"), outDir=i)
+                resultDict["das"][compPair].update({"dasDistribution": dasDistribution})
 
-                cmd = "cat {} | grep -v 'ID' | cut -f 2 | sort -u > dasg.lst".format(" ".join(tmpSigAsFiles))
-                subprocess.call(cmd, shell=True)
-                from plotRscriptStrs import plotTargetGenesGoEnrichmentStr
-                outName = compPair
-                gene2goFile = args.gene2goFile if args.gene2goFile else optionTools.gene2go
-                if not gene2goFile:
-                    print "You don't provide gene2go file, the GO enrichment will not be carried out!"
-                    continue
-
-                from rpy2 import robjects
-                from rpy2.rinterface import RRuntimeWarning
-                warnings.filterwarnings("ignore", category=RRuntimeWarning)
-                robjects.r(plotTargetGenesGoEnrichmentStr)
-                robjects.r.plotTargetGenesGoEnrichment("dasg.lst", outName, gene2goFile, outName, float(args.cutoff),
-                                                       args.filterBy, int(args.showCategory))
-                enrichResult = os.path.abspath(outName + ".goEnrichResults.txt")
-                enrichPlot = convertPdf2png(inPdf=os.path.abspath(outName + ".pdf"))
+                # cmd = "cat {} | grep -v 'ID' | cut -f 2 | sort -u > dasg.lst".format(" ".join(tmpSigAsFiles))
+                # subprocess.call(cmd, shell=True)
+                # from plotRscriptStrs import plotTargetGenesGoEnrichmentStr
+                # outName = compPair
+                # gene2goFile = args.gene2goFile if args.gene2goFile else optionTools.gene2go
+                # if not gene2goFile:
+                #     print "You don't provide gene2go file, the GO enrichment will not be carried out!"
+                #     continue
+                #
+                # from rpy2 import robjects
+                # from rpy2.rinterface import RRuntimeWarning
+                # warnings.filterwarnings("ignore", category=RRuntimeWarning)
+                # robjects.r(plotTargetGenesGoEnrichmentStr)
+                # robjects.r.plotTargetGenesGoEnrichment("dasg.lst", outName, gene2goFile, outName, float(args.cutoff),
+                #                                        args.filterBy, int(args.showCategory))
+                enrichResult = os.path.abspath(os.path.join(i, "sigDiff.goEnrichResults.txt"))
+                enrichPlot = convertPdf2png(inPdf=os.path.abspath(os.path.join(i, "sigDiff.goEnrichResults.pdf")))
                 resultDict["das"][compPair].update({"goEnrichResults": enrichResult})
                 resultDict["das"][compPair].update({"goEnrichPlot": enrichPlot})
 

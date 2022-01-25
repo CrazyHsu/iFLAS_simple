@@ -143,7 +143,7 @@ def mergeIsoforms(samples=None, dirSpec=None):
 
 
 def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, args=None, optionTools=None):
-    print getCurrentTime() + " Identify differential alternative spliced isoforms..."
+    print getCurrentTime() + " Identify differential alternative spliced genes..."
     if validateFile(compCondFile):
         compCondFile = os.path.abspath(compCondFile)
     else:
@@ -226,7 +226,8 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, 
             from rpy2.rinterface import RRuntimeWarning
             warnings.filterwarnings("ignore", category=RRuntimeWarning)
             robjects.r(plotTargetGenesGoEnrichmentStr)
-            robjects.r.plotTargetGenesGoEnrichment("dasg.lst", compOutDir, gene2goFile, "sigDiff", float(args.cutoff),
+            robjects.r.plotTargetGenesGoEnrichment("dasg.lst", compOutDir, gene2goFile,
+                                                   "{}.sigDiffAS/sigDiff".format(compOutDir), float(args.cutoff),
                                                    args.filterBy, int(args.showCategory))
         # enrichResult = os.path.abspath("sigDiff.goEnrichResults.txt")
         # enrichPlot = convertPdf2png(inPdf=os.path.abspath(outName + ".pdf"))
@@ -234,4 +235,4 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, 
         # resultDict["das"][compPair].update({"goEnrichPlot": enrichPlot})
 
     os.chdir(prevDir)
-    print getCurrentTime() + " Identify differential alternative spliced isoforms done!"
+    print getCurrentTime() + " Identify differential alternative spliced genes done!"
