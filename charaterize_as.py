@@ -13,6 +13,8 @@ from commonFuncs import *
 from commonObjs import *
 
 def drawSSmotif(asMotif=None, outPrefix=None, asType="IR"):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     with open(asMotif) as f:
         lineList = f.readlines()
         mySum = sum([int(i.strip("\n").split("\t")[1]) for i in lineList])
@@ -40,7 +42,7 @@ def drawSSmotif(asMotif=None, outPrefix=None, asType="IR"):
             otherSum = sum([int(i.strip("\n").split("\t")[1]) for i in lineList[3:]])
             print >> tmp, "\t".join(["Other", str(float(otherSum)/mySum)])
         tmp.close()
-        cmd = "cat {}.tmp.txt | bar.R -fillV=V1 -fp -lgPos=top -w=10 -p={}.ssMotif.pdf 2>/dev/null".format(outPrefix, outPrefix)
+        cmd = "cat {}.tmp.txt | {}/bar.R -fillV=V1 -fp -lgPos=top -w=10 -p={}.ssMotif.pdf 2>/dev/null".format(outPrefix, utilDir, outPrefix)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
         # os.remove("tmp.txt")
         # os.remove(asMotif)
@@ -127,6 +129,8 @@ def getASstatistics(asType="IR", asFile=None, annoFile=None, novelFile=None, out
 
 
 def getDist2TTS(refParams=None, paGroup=None):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     with open(paGroup) as f:
         out = open("lrPA.bed6", "w")
         for line in f:
@@ -137,14 +141,16 @@ def getDist2TTS(refParams=None, paGroup=None):
                 print >>out, "\t".join(map(str, [lineInfo[0], lineInfo[1], int(lineInfo[1])+1] + lineInfo[3:]))
         out.close()
     cmd = '''
-        bedtools closest -a <(sort -k1,1 -k2,2n lrPA.bed6) -b <(gpeFeature.pl --tts {}|
-        sort -k1,1 -k2,2n) -s -D a | select.pl -i 13,4 | sort -u | tee lrPA2TTS.tsv | 
-        cut -f1 | box.R -w=10 -ng -nJ -no -y='Distance to TTS' -p=lrPA2TTS.pdf
-    '''.format(refParams.ref_gpe)
+        bedtools closest -a <(sort -k1,1 -k2,2n lrPA.bed6) -b <({}/gpeFeature.pl --tts {}|
+        sort -k1,1 -k2,2n) -s -D a | {}/select.pl -i 13,4 | sort -u | tee lrPA2TTS.tsv | 
+        cut -f1 | {}/box.R -w=10 -ng -nJ -no -y='Distance to TTS' -p=lrPA2TTS.pdf
+    '''.format(utilDir, utilDir, refParams.ref_gpe, utilDir)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
 
 def getSpliceSite(asType=None, asFile=None, outFile=None):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     if asType == "IR":
         out = open(outFile, "w")
         with open(asFile) as f:
@@ -154,13 +160,13 @@ def getSpliceSite(asType=None, asFile=None, outFile=None):
                 print >>out, "\t".join([lineInfo[0], posList[0], posList[1], lineInfo[3]])
         out.close()
     elif asType == "SE":
-        cmd = "seDecompose.pl confident.SE.lst >SE.inc.splicesite 2>SE.exc.splicesite"
+        cmd = "{}/seDecompose.pl confident.SE.lst >SE.inc.splicesite 2>SE.exc.splicesite".format(utilDir)
         subprocess.call(cmd, shell=True)
     elif asType == "A3SS":
-        cmd = "anssDecompose.pl -n 5 confident.A5SS.lst >A5SS.inc.splicesite 2>A5SS.exc.splicesite"
+        cmd = "{}/anssDecompose.pl -n 5 confident.A5SS.lst >A5SS.inc.splicesite 2>A5SS.exc.splicesite".format(utilDir)
         subprocess.call(cmd, shell=True)
     elif asType == "A5SS":
-        cmd = "anssDecompose.pl -n 3 confident.A3SS.lst >A3SS.inc.splicesite 2>A3SS.exc.splicesite"
+        cmd = "{}/anssDecompose.pl -n 3 confident.A3SS.lst >A3SS.inc.splicesite 2>A3SS.exc.splicesite".format(utilDir)
         subprocess.call(cmd, shell=True)
 
 
@@ -253,6 +259,8 @@ def charaterize_as(dataObj=None, refParams=None, dirSpec=None):
     print getCurrentTime() + " ASE Characterization for project {} entry {}...".format(projectName, sampleName)
     prevDir = os.getcwd()
     characAsDir = os.path.join(dirSpec.out_dir, projectName, sampleName, "as_events", "characterization")
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     resolveDir(characAsDir)
     getAnnoASList("../ordinary_as/LR/SE.bed12+", "LR.SE.lst")
     getAnnoASList("../ordinary_as/LR/A5SS.bed6+", "LR.A5SS.lst")
@@ -278,10 +286,10 @@ def charaterize_as(dataObj=None, refParams=None, dirSpec=None):
         makeLink("Common.A3SS.lst", "confident.A3SS.lst")
 
         cmd = '''
-                venn.R {NGS,LR}.SE.lst   -rD=90 -cP=180,0 -p=SE.pdf 1>/dev/null 2>&1
-                venn.R {NGS,LR}.A5SS.lst -rD=90 -cP=180,0 -p=A5SS.pdf 1>/dev/null 2>&1
-                venn.R {NGS,LR}.A3SS.lst -rD=90 -cP=180,0 -p=A3SS.pdf 1>/dev/null 2>&1
-        '''
+                %s/venn.R {NGS,LR}.SE.lst   -rD=90 -cP=180,0 -p=SE.pdf 1>/dev/null 2>&1
+                %s/venn.R {NGS,LR}.A5SS.lst -rD=90 -cP=180,0 -p=A5SS.pdf 1>/dev/null 2>&1
+                %s/venn.R {NGS,LR}.A3SS.lst -rD=90 -cP=180,0 -p=A3SS.pdf 1>/dev/null 2>&1
+        ''' % (utilDir, utilDir, utilDir)
         subprocess.call(cmd, shell=True)
 
         filterFile(originFile="NGS.SE.lst", targetFile="LR.SE.lst", outFile="LR.specific.SE.lst", mode="e")
@@ -294,7 +302,7 @@ def charaterize_as(dataObj=None, refParams=None, dirSpec=None):
         makeLink("LR.A3SS.lst", "confident.A3SS.lst")
 
     # Classify APE into annotated or novel according to reference gene model
-    cmd = '''awk '{{print $0"\t"$12}}' {} | gpe2bed.pl -p >reference.bed12+'''.format(refParams.ref_gpe)
+    cmd = '''awk '{{print $0"\t"$12}}' {} | {}/gpe2bed.pl -p >reference.bed12+'''.format(utilDir, refParams.ref_gpe)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
     transBedList = GenePredObj(refParams.ref_gpe, bincolumn=False).toBed(gene=True)
@@ -324,9 +332,9 @@ def charaterize_as(dataObj=None, refParams=None, dirSpec=None):
     getAnnoASList("SE.reference.bed6+", "SE.reference.lst")
     getAnnoASList("A3SS.reference.bed6+", "A3SS.reference.lst")
     getAnnoASList("A5SS.reference.bed6+", "A5SS.reference.lst")
-    cmd = "paGroup.pl reference.bed12+ >paGroup.reference.tsv 2>paGroup.reference.bed6"
+    cmd = "{}/paGroup.pl reference.bed12+ >paGroup.reference.tsv 2>paGroup.reference.bed6".format(utilDir)
     subprocess.call(cmd, shell=True)
-    cmd = "paCmp.pl -r paGroup.reference.tsv -a annoPA.tsv -n novelPA.tsv ../pa/reads.paGrouped.tsv >paGroup.novel.tsv 2>paGroup.anno.tsv"
+    cmd = "{}/paCmp.pl -r paGroup.reference.tsv -a annoPA.tsv -n novelPA.tsv ../pa/reads.paGrouped.tsv >paGroup.novel.tsv 2>paGroup.anno.tsv".format(utilDir)
     subprocess.call(cmd, shell=True)
 
     filterFile(originFile="IR.reference.lst", targetFile="LR.IR.lst", outFile="IR.anno.lst", mode="i")

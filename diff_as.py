@@ -105,6 +105,8 @@ def validateSamples(compCondFile, dataToProcess):
 
 
 def mergeIsoforms(samples=None, dirSpec=None):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     tmpDict = {}
     mergedIso2ReadsBed = open("all_sample_merged_iso.bed", "w")
     for i in samples:
@@ -112,7 +114,7 @@ def mergeIsoforms(samples=None, dirSpec=None):
         aseDir = os.path.join(dirSpec.out_dir, i.project_name, i.sample_name, "as_events", "ordinary_as")
         cmd = '''(cut -f 8,10 --output-delimiter=',' {}/LR/A3SS.confident.bed6+ {}/LR/A5SS.confident.bed6+ {}/LR/IR.confident.bed6+;
               cut -f 16,18 --output-delimiter=',' {}/LR/SE.confident.bed12+) | tr ',' '\n' | sort -u |
-              filter.pl -o - {} -2 4 -m i > as_isoform.bed12+'''.format(aseDir, aseDir, aseDir, aseDir, isoformGroupedBed12)
+              {}/filter.pl -o - {} -2 4 -m i > as_isoform.bed12+'''.format(aseDir, aseDir, aseDir, aseDir, utilDir, isoformGroupedBed12)
         subprocess.call(cmd, shell=True)
         isoBedObj = BedFile("as_isoform.bed12+", type="bed12+")
         gene2iso = {}
@@ -150,12 +152,14 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, 
         compCondFile = compCondFile.split(",")
     prevDir = os.getcwd()
     dasDir = os.path.join(dirSpec.out_dir, "das")
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     resolveDir(dasDir)
     samples, conditions = validateSamples(compCondFile, dataToProcess)
     if len(samples) == 0:
         raise Exception("May be you provide wrong sample comparison condition, please check it!")
     mergedIsoBed = mergeIsoforms(samples=samples, dirSpec=dirSpec)
-    cmd = "bed2gpe.pl -g 13 {} > all_sample_merged_iso.gpe".format(mergedIsoBed)
+    cmd = "{}/bed2gpe.pl -g 13 {} > all_sample_merged_iso.gpe".format(utilDir, mergedIsoBed)
     subprocess.call(cmd, shell=True)
     cmd = "genePredToGtf file all_sample_merged_iso.gpe all_sample_merged_iso.gtf"
     subprocess.call(cmd, shell=True)

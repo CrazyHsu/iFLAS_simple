@@ -210,6 +210,8 @@ def polyaLenCalling(dataObj=None, refParams=None, dirSpec=None):
     baseDir = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name)
     fast5Dir = dataObj.data_location
     nanoporeFileType = checkFast5Files(fast5Dir)
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     if nanoporeFileType == "fast5":
         basecallingOut = os.path.join(baseDir, "preprocess", "nanopore", "guppy_basecalling")
         nanoporeRawFq = os.path.join(baseDir, "preprocess", "nanopore", "rawFlnc.fq")
@@ -221,7 +223,7 @@ def polyaLenCalling(dataObj=None, refParams=None, dirSpec=None):
         cmd = "nanopolish polya --threads={} --reads={} --bam={} --genome={} > polya_results.tsv".format(dataObj.single_run_threads, nanoporeRawFq, mappedBam, refParams.ref_genome)
         subprocess.call(cmd, shell=True)
         dataObj.polya_location = os.path.join(os.getcwd(), "polya_results.tsv")
-        cmd = '''grep 'PASS' polya_results.tsv | cut -f 9 | hist.R -x='poly(A) tail Length' -y=Density -b=1 -d -x1=0 -x2=100c -w=10 -p=polyaTailLength.pdf 2>/dev/null'''
+        cmd = '''grep 'PASS' polya_results.tsv | cut -f 9 | {}/hist.R -x='poly(A) tail Length' -y=Density -b=1 -d -x1=0 -x2=100c -w=10 -p=polyaTailLength.pdf 2>/dev/null'''.format(utilDir)
         subprocess.call(cmd, shell=True)
     else:
         raise Exception("Please specify the correct directory contain fast5 files!")

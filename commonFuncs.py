@@ -410,7 +410,9 @@ def initRefSetting(refParams=None, dirSpec=None):
 
     if refParams.ref_bed == None:
         refParams.ref_bed = os.path.join(gtfDir, "iFLAS.annotation.bed")
-        cmd = "gpe2bed.pl -g {} > {}".format(refParams.ref_gpe, refParams.ref_bed)
+        scriptDir = os.path.dirname(os.path.abspath(__file__))
+        utilDir = os.path.join(scriptDir, "utils")
+        cmd = "{}/gpe2bed.pl -g {} > {}".format(utilDir, refParams.ref_gpe, refParams.ref_bed)
         subprocess.call(cmd, shell=True)
     else:
         refParams.ref_bed = os.path.abspath(os.path.join(originDir, refParams.ref_bed))

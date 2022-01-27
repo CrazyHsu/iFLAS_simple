@@ -79,16 +79,18 @@ def getJuncFromRegtools(dataObj=None, dirSpec=None, filterByCount=10):
 
 
 def mappingFilterAndAddTags(samFile=None, outPrefix="flnc", maxLength=50000, refBedFile=None, juncBedFile=None, threads=10, juncCombSup=2):
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     cmd = "bamToBed -i <(samtools view -bS {}) -bed12 > tmp.bed12".format(samFile)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
     filteredReads = filterByJunc(bedFile="tmp.bed12", outPrefix=outPrefix, refBedFile=refBedFile, juncBedFile=juncBedFile, maxIntronLen=maxLength, juncCombSupportN=juncCombSup)
-    cmd = '''(samtools view -H {}; filter.pl -o {} {} -m i) > tmp.sam'''.format(samFile, filteredReads, samFile)
+    cmd = '''(samtools view -H {}; {}/filter.pl -o {} {} -m i) > tmp.sam'''.format(samFile, utilDir, filteredReads, samFile)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
     cmd = '''(samtools view -H tmp.sam; samtools view -f 16 -F 4079 tmp.sam; samtools view -f 0 -F 4095 tmp.sam) | 
         samtools sort -@ {} --output-fmt SAM > {}.mm2.sam'''.format(threads, outPrefix)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
-    cmd = '''samAddTag.pl --checkHardClip --coverage --identity --u unmmaped.sam {}.mm2.sam 2> lengthInconsistent.sam | 
-            sam2bed.pl -t CV,ID > {}.addCVandID.bed12+ 2>/dev/null'''.format(outPrefix, outPrefix)
+    cmd = '''{}/samAddTag.pl --checkHardClip --coverage --identity --u unmmaped.sam {}.mm2.sam 2> lengthInconsistent.sam | 
+            {}/sam2bed.pl -t CV,ID > {}.addCVandID.bed12+ 2>/dev/null'''.format(utilDir, outPrefix, utilDir, outPrefix)
     subprocess.call(cmd, shell=True)
     cmd = "samtools view -bS -@ {} {}.mm2.sam > {}.mm2.sorted.bam".format(threads, outPrefix, outPrefix)
     subprocess.call(cmd, shell=True)

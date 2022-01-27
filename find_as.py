@@ -558,6 +558,8 @@ def find_all_as(dataObj=None, refParams=None, dirSpec=None):
     baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
 
     workDir = os.path.join(baseDir, "as_events", "ordinary_as")
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     resolveDir(workDir)
     isoformBed = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
     tofuGroupFile = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
@@ -628,12 +630,12 @@ def find_all_as(dataObj=None, refParams=None, dirSpec=None):
                    outFile="LR/SE.NGS.bed12+")
         filterFile(originFile="LR/SE.bed12+", targetFile="NGS/SE.bed12+", originField=4, targetField=4,
                    outFile="NGS/SE.LR.bed12+")
-        cmd = "juncAssign.pl -g {} {} >junction.assigned.bed12+".format(refParams.ref_gpe, dataObj.ngs_junctions)
+        cmd = "{}/juncAssign.pl -g {} {} >junction.assigned.bed12+".format(utilDir, refParams.ref_gpe, dataObj.ngs_junctions)
         subprocess.call(cmd, shell=True)
         cmd = '''
-                    AnSSconfirmByJunc.pl -t 5 -j junction.assigned.bed12+ LR/A5SS.bed6+ >NGS/A5SS.LR.bed6+ 2>LR/A5SS.NGS.bed6+
-                    AnSSconfirmByJunc.pl -t 3 -j junction.assigned.bed12+ LR/A3SS.bed6+ >NGS/A3SS.LR.bed6+ 2>LR/A3SS.NGS.bed6+
-            '''
+                    {}/AnSSconfirmByJunc.pl -t 5 -j junction.assigned.bed12+ LR/A5SS.bed6+ >NGS/A5SS.LR.bed6+ 2>LR/A5SS.NGS.bed6+
+                    {}/AnSSconfirmByJunc.pl -t 3 -j junction.assigned.bed12+ LR/A3SS.bed6+ >NGS/A3SS.LR.bed6+ 2>LR/A3SS.NGS.bed6+
+            '''.format(utilDir, utilDir)
         subprocess.call(cmd, shell=True)
 
         # cmd = '''
@@ -644,9 +646,9 @@ def find_all_as(dataObj=None, refParams=None, dirSpec=None):
         #     '''
         # subprocess.call(cmd, shell=True)
         cmd = '''
-                    awk 'BEGIN{FS=OFS="\t"}{$4=$4":"$6;print}' junction.assigned.bed12+ | getNgsA5SS.pl -e 0 >NGS/A5SS.known.bed6+ 2>NGS/A5SS.novel.bed6+
-                    awk 'BEGIN{FS=OFS="\t"}{$4=$4":"$6;print}' junction.assigned.bed12+ | getNgsA3SS.pl -e 0 >NGS/A3SS.known.bed6+ 2>NGS/A3SS.novel.bed6+
-            '''
+                    awk 'BEGIN{FS=OFS="\t"}{$4=$4":"$6;print}' junction.assigned.bed12+ | %s/getNgsA5SS.pl -e 0 >NGS/A5SS.known.bed6+ 2>NGS/A5SS.novel.bed6+
+                    awk 'BEGIN{FS=OFS="\t"}{$4=$4":"$6;print}' junction.assigned.bed12+ | %s/getNgsA3SS.pl -e 0 >NGS/A3SS.known.bed6+ 2>NGS/A3SS.novel.bed6+
+            ''' % (utilDir, utilDir)
 
         subprocess.call(cmd, shell=True)
         # cmd = '''
@@ -669,7 +671,7 @@ def find_all_as(dataObj=None, refParams=None, dirSpec=None):
 
     cmd = '''(cut -f 8,10 --output-delimiter=',' LR/A3SS.confident.bed6+ LR/A5SS.confident.bed6+ LR/IR.confident.bed6+;
                   cut -f 16,18 --output-delimiter=',' LR/SE.confident.bed12+) | tr ',' '\n' | sort -u |
-                  filter.pl -o - {} -2 4 -m i > isoformGrouped.AS.confident.bed12+'''.format(isoformBed)
+                  {}/filter.pl -o - {} -2 4 -m i > isoformGrouped.AS.confident.bed12+'''.format(utilDir, isoformBed)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
     # cmd = '''

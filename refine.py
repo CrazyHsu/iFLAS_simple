@@ -373,6 +373,8 @@ def refineJunc(dataObj=None, refParams=None, dirSpec=None, refine=True, adjust=T
     print getCurrentTime() + " Refine the collapsed isoforms for project {} sample {}...".format(projectName, sampleName)
     baseDir = os.path.join(dirSpec.out_dir, projectName, sampleName)
     refineDir = os.path.join(baseDir, "refine")
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    utilDir = os.path.join(scriptDir, "utils")
     resolveDir(refineDir)
     processedFa = os.path.join(baseDir, "mapping", "flnc.processed.fa")
     processedBed = os.path.join(baseDir, "mapping", "flnc.addCVandID.bed12+")
@@ -381,7 +383,7 @@ def refineJunc(dataObj=None, refParams=None, dirSpec=None, refine=True, adjust=T
     collapsedGroup = os.path.join(baseDir, "collapse", "tofu.collapsed.group.txt")
     cmd = "gtfToGenePred {} tofu.collapsed.gpe -genePredExt".format(collapsedGff)
     subprocess.call(cmd, shell=True)
-    cmd = "gpe2bed.pl tofu.collapsed.gpe -g > tofu.collapsed.bed12+"
+    cmd = "{}/gpe2bed.pl tofu.collapsed.gpe -g > tofu.collapsed.bed12+".format(utilDir)
     subprocess.call(cmd, shell=True)
 
     if refine:
@@ -396,7 +398,7 @@ def refineJunc(dataObj=None, refParams=None, dirSpec=None, refine=True, adjust=T
             juncScoringParams = "-r {} tofu.strandConfirm.bed12+ -j {}".format(refParams.ref_gpe, dataObj.ngs_junctions)
         else:
             juncScoringParams = "-r {} tofu.strandConfirm.bed12+".format(refParams.ref_gpe)
-        cmd = "juncConsensus.pl -s <(juncScoring.pl {}) -l 5 tofu.strandConfirm.bed12+ > tofu.juncAdjusted.bed12+".format(juncScoringParams)
+        cmd = "{}/juncConsensus.pl -s <({}/juncScoring.pl {}) -l 5 tofu.strandConfirm.bed12+ > tofu.juncAdjusted.bed12+".format(utilDir, utilDir, juncScoringParams)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
 
         readsAssign(refParams.ref_bed, "tofu.juncAdjusted.bed12+", readsColNum=13, outPrefix="tofu.collapsed.assigned", group=True)
@@ -410,10 +412,10 @@ def refineJunc(dataObj=None, refParams=None, dirSpec=None, refine=True, adjust=T
     ######## for reads
     cmd = '''seqkit grep {} -f <(cut -f 2 {} | tr ',' '\n') -w 0 > flnc.processed.ignore_id_removed.fa'''.format(processedFa, collapsedGroup)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
-    cmd = '''filter.pl -o <(cut -f 2 {} | tr ',' '\n') {} -2 4 -m i > flnc.processed.ignore_id_removed.bed12+'''.format(collapsedGroup, processedBed)
+    cmd = '''{}/filter.pl -o <(cut -f 2 {} | tr ',' '\n') {} -2 4 -m i > flnc.processed.ignore_id_removed.bed12+'''.format(utilDir, collapsedGroup, processedBed)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
     readsAssign(refParams.ref_bed, "flnc.processed.ignore_id_removed.bed12+", readsColNum=14, outPrefix="reads.assigned", group=True)
 
-    cmd = "cut -f 1-12,15 reads.assigned.unambi.bed12+ | bed2gpe.pl -b 12 -g 13 - | genePredToGtf file stdin reads.unambi.gtf -source=iFLAS"
+    cmd = "cut -f 1-12,15 reads.assigned.unambi.bed12+ | {}/bed2gpe.pl -b 12 -g 13 - | genePredToGtf file stdin reads.unambi.gtf -source=iFLAS".format(utilDir)
     subprocess.call(cmd, shell=True)
     print getCurrentTime() + " Refine the collapsed isoforms for project {} sample {} done!".format(projectName, sampleName)
