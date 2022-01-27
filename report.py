@@ -66,20 +66,20 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
     resolveDir(basicStatisticsDir)
     cmd = "seqkit fx2tab -n -g {} | cut -f 1,2 > GC_of_raw_flnc_reads.log".format(flncFx)
     subprocess.call(cmd, shell=True)
-    cmd = '''cut -f2 GC_of_raw_flnc_reads.log | distrCurve.R -d -m='GC Content of raw flnc Reads' -x='Binned GC%' -y='Fraction of Reads' -v=50 -p=GC_of_raw_flnc_reads.pdf 2>/dev/null'''
+    cmd = '''cut -f2 GC_of_raw_flnc_reads.log | distrCurve.R -d -m='GC Content of raw flnc Reads' -x='Binned GC%' -y='Fraction of Reads' -v=50 -w=10 -p=GC_of_raw_flnc_reads.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
 
     gcAcrossRead(flncFx, "GC_across_raw_flnc_read.log")
-    cmd = '''cut -f2- GC_across_raw_flnc_read.log | box.R -stack -nJ -ho=50 -m='GC Content across raw flnc Reads' -x=Interval -y=GC% -oS=0.5 -w=11 -p=GC_across_raw_flnc_read.pdf 2>/dev/null'''
+    cmd = '''cut -f2- GC_across_raw_flnc_read.log | box.R -stack -nJ -ho=50 -m='GC Content across raw flnc Reads' -x=Interval -y=GC% -oS=0.5 -w=10 -p=GC_across_raw_flnc_read.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
 
     cmd = "seqkit fx2tab -n -l {} | cut -f 2 > readsLength.lst".format(flncFx)
     subprocess.call(cmd, shell=True)
     cmd = "gpe2bed.pl {} | bedLength.pl | cut -f 13 > referenceGeneLength.lst".format(refParams.ref_gpe)
     subprocess.call(cmd, shell=True)
-    cmd = '''distrCurves.R -x1=0 -x2=10000 -d -x='Binned Length (limited in 0-10000)' -w=15 *.lst -b=150 -p=LengthDistribution.curve.pdf 2>/dev/null'''
+    cmd = '''distrCurves.R -x1=0 -x2=10000 -d -x='Binned Length (limited in 0-10000)' -w=10 *.lst -b=150 -p=LengthDistribution.curve.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
-    cmd = '''boxes.R -ng -no *.lst -p=LengthDistribution.box.pdf 2>/dev/null'''
+    cmd = '''boxes.R -ng -no *.lst -w=10 -p=LengthDistribution.box.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
 
     dataObj.ngs_junctions = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "rna-seq", "reassembly", "junctions.bed")
@@ -88,7 +88,7 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
         cmd = '''awk '$10>1' {} | bed2gpe.pl | transSupportByJunction.pl -j {} >supportedByRNAseq.tsv 2>supportedByRNAseq.summary'''.format(
             isoformBed, dataObj.ngs_junctions)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
-        cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=12 -p=supportedByRNAseq.pdf 2>/dev/null'''
+        cmd = '''awk 'BEGIN{OFS="\t"}{print $1,$2,$4/$3}' supportedByRNAseq.summary | summary2d.R -binWidthX=0.9999999 -binWidthY=0.9999999 -x='Junction Count of PacBio Reads' -y='Supported Junction Count' -fL=gray -fH=red -w=10 -p=supportedByRNAseq.pdf 2>/dev/null'''
         subprocess.call(cmd, shell=True, executable="/bin/bash")
     os.chdir(currDir)
     print getCurrentTime() + " Plotting Reads Content Evaluation for project {} sample {} done!".format(dataObj.project_name, dataObj.sample_name)

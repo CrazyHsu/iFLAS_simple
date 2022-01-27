@@ -17,7 +17,7 @@ plotReadsCorrectedEvalStr = '''
         correctMapped$accuracy <- (correctMapped$V13 * correctMapped$V14)/100
         rawMapped$type <- "Raw"
         correctMapped$type <- "Corrected"
-        pdf(outPdf)
+        pdf(outPdf, height=6, width=10)
         p <- ggplot(rbind(rawMapped,correctMapped), aes(x=accuracy, fill=type)) + 
         geom_histogram(alpha=0.6, position = 'identity', binwidth=1) + 
         scale_fill_manual(values=c("#ff6666", "#C0C0C0")) + 

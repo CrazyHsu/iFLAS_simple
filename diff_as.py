@@ -187,7 +187,7 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, 
         if cond1Paired != cond2Paired or len(cond1Paired) > 1 or len(cond2Paired) > 1 or cond1Length != cond2Length or len(cond1Length) > 1 or len(cond2Length) > 1:
             print "rMATS can't resolve the situation where condition {} and {} with different ngs sequencing strategy or read length!".format(comp1Name, comp2Name)
             continue
-        cmd = "rmats.py --b1 {} --b2 {} --gtf {} --od {} -t {} --readLength {} --tstat {} --nthread {} 2>{}.rmats.log"
+        cmd = "rmats.py --b1 {} --b2 {} --gtf {} --od {} -t {} --readLength {} --tstat {} --nthread {} 1>{}.rmats.log 2>&1"
         cmd = cmd.format(b1File, b2File, gtfFile, compOutDir, cond1Paired[0], cond1Length[0], currentThreads, currentThreads, compOutDir)
         subprocess.call(cmd, shell=True)
 
@@ -224,9 +224,10 @@ def diff_as(dataToProcess, compCondFile=None, dirSpec=None, sampleMerged=False, 
 
             from rpy2 import robjects
             from rpy2.rinterface import RRuntimeWarning
+            import warnings
             warnings.filterwarnings("ignore", category=RRuntimeWarning)
             robjects.r(plotTargetGenesGoEnrichmentStr)
-            robjects.r.plotTargetGenesGoEnrichment("dasg.lst", compOutDir, gene2goFile,
+            robjects.r.plotTargetGenesGoEnrichment("{}.sigDiffAS/dasg.lst".format(compOutDir), compOutDir, gene2goFile,
                                                    "{}.sigDiffAS/sigDiff".format(compOutDir), float(args.cutoff),
                                                    args.filterBy, int(args.showCategory))
         # enrichResult = os.path.abspath("sigDiff.goEnrichResults.txt")

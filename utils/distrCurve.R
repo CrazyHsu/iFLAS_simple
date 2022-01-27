@@ -13,6 +13,7 @@ Option:
     Common:
     -p|pdf      FILE    The output figure in pdf[figure.pdf]
     -w|width    INT     The figure width
+    -height     INT     The figure height
     -m|main     STR     The main title
     -mainS      DOU     The size of main title[22 for ggplot]
     -x|xlab     STR     The xlab[Binned Values]
@@ -145,6 +146,7 @@ if(length(args) >= 1){
         if(arg == '-h' || arg == '-help') usage()
         tmp = parseArg(arg, 'p(df)?', 'p'); if(!is.null(tmp)) myPdf = tmp
         tmp = parseArgAsNum(arg, 'w(idth)?', 'w'); if(!is.null(tmp)) width = tmp
+        tmp = parseArgAsNum(arg, 'height', 'height'); if(!is.null(tmp)) height = tmp
         if(arg == '-ng' || arg == '-noGgplot') noGgplot = TRUE
         tmp = parseArgAsNum(arg, 'x1', 'x1'); if(!is.null(tmp)) x1 = tmp
         tmp = parseArgAsNum(arg, 'x2', 'x2'); if(!is.null(tmp)) x2 = tmp
@@ -159,8 +161,12 @@ if(length(args) >= 1){
   }
 }
 
-if(exists('width')){
-    pdf(myPdf, width = width)
+if(exists('width') && !exists('height')){
+    pdf(myPdf, width = width, height = width * 0.6)
+}else if(!exists('width') && exists('height')){
+    pdf(myPdf, width = height * 1.6, height = height)
+}else if(exists('width') && exists('height')){
+    pdf(myPdf, width = width, height = height)
 }else{
     pdf(myPdf)
 }

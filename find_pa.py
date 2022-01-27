@@ -287,7 +287,7 @@ def find_pa(dataObj=None, refParams=None, dirSpec=None, filterPaByRPKM=0, filter
                     print >>cleavageOut, "\t".join(map(str, [chrom, start, start + 1, "ClevageSite{}".format(count), 0, strand]))
         cleavageOut.close()
 
-    cmd = '''bedClosest.pl cleavage.bed6 | tee adjacentCleavage.tsv | cut -f13 | distrCurve.R -xl=2 -d -x='Binned Distance between Adjacent Cleavage Site' -p=adjacentCleavageDistr.pdf 2>/dev/null'''
+    cmd = '''bedClosest.pl cleavage.bed6 | tee adjacentCleavage.tsv | cut -f13 | distrCurve.R -w=10 -xl=2 -d -x='Binned Distance between Adjacent Cleavage Site' -p=adjacentCleavageDistr.pdf 2>/dev/null'''
     subprocess.call(cmd, shell=True)
 
     # pa(polish_flnc_cluster="clustered_unclustered.merged_report.csv", bed12="target.transcript.correlated.flnc.sorted.bed12+",
@@ -331,10 +331,10 @@ def find_pa(dataObj=None, refParams=None, dirSpec=None, filterPaByRPKM=0, filter
     resolveDir("motif")
     motifAroundPA("../PA.bed6+", up1=100, down1=100, up2=50, down2=0, refFasta=refParams.ref_genome, chrLenFile=refParams.ref_size)
 
-    cmd = '''lines.R -w=15 -y=Frequency -x='Distance Relative to PA' -m='Distribution of Nucleotide Frequency around PA' -p=nucleotide.pdf *.nucleotide 2>/dev/null'''
+    cmd = '''lines.R -w=10 -y=Frequency -x='Distance Relative to PA' -m='Distribution of Nucleotide Frequency around PA' -p=nucleotide.pdf *.nucleotide 2>/dev/null'''
     subprocess.call(cmd, shell=True)
-    cmd = '''lines.R -p=PAS.1.pdf {AATAAA,AAATAA,ATAAAA,ATTAAA,ATAAAT,TAATAA}.PAS -x1=-50 -x2=0 -w=15 2>/dev/null &&
-             lines.R -p=PAS.2.pdf {ATAAAG,AAAATA,CAATAA,ATAAAC,AAAAAA,AAAAAG}.PAS -x1=-50 -x2=0 -w=15 2>/dev/null
+    cmd = '''lines.R -p=PAS.1.pdf {AATAAA,AAATAA,ATAAAA,ATTAAA,ATAAAT,TAATAA}.PAS -x1=-50 -x2=0 -w=10 2>/dev/null &&
+             lines.R -p=PAS.2.pdf {ATAAAG,AAAATA,CAATAA,ATAAAC,AAAAAA,AAAAAG}.PAS -x1=-50 -x2=0 -w=10 2>/dev/null
     '''
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 
@@ -343,7 +343,7 @@ def find_pa(dataObj=None, refParams=None, dirSpec=None, filterPaByRPKM=0, filter
     motifPercentSummedDF = pd.concat(motifPercentDF, axis=1).sum(axis=1)
     motifPercentSummedDF.to_frame().to_csv("Other.PAS", sep="\t", header=None)
 
-    cmd = '''lines.R -p=PAS.pdf {Other,AATAAA,AAATAA,ATAAAA,ATTAAA,ATAAAT,TAATAA}.PAS -x1=-50 -x2=0 -w=15 2>/dev/null'''
+    cmd = '''lines.R -p=PAS.pdf {Other,AATAAA,AAATAA,ATAAAA,ATTAAA,ATAAAT,TAATAA}.PAS -x1=-50 -x2=0 -w=10 2>/dev/null'''
     subprocess.call(cmd, shell=True, executable="/bin/bash")
     os.chdir(prevDir)
     print getCurrentTime() + " Polyadenylation analysis for project {} entry {} done!".format(projectName, sampleName)

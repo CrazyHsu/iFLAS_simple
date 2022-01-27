@@ -40,7 +40,7 @@ def drawSSmotif(asMotif=None, outPrefix=None, asType="IR"):
             otherSum = sum([int(i.strip("\n").split("\t")[1]) for i in lineList[3:]])
             print >> tmp, "\t".join(["Other", str(float(otherSum)/mySum)])
         tmp.close()
-        cmd = "cat {}.tmp.txt | bar.R -fillV=V1 -fp -lgPos=top -w=12 -p={}.ssMotif.pdf 2>/dev/null".format(outPrefix, outPrefix)
+        cmd = "cat {}.tmp.txt | bar.R -fillV=V1 -fp -lgPos=top -w=10 -p={}.ssMotif.pdf 2>/dev/null".format(outPrefix, outPrefix)
         subprocess.call(cmd, shell=True, executable="/bin/bash")
         # os.remove("tmp.txt")
         # os.remove(asMotif)
@@ -128,7 +128,7 @@ def getASstatistics(asType="IR", asFile=None, annoFile=None, novelFile=None, out
 
 def getDist2TTS(refParams=None, paGroup=None):
     with open(paGroup) as f:
-        out = open("pbPA.bed6", "w")
+        out = open("lrPA.bed6", "w")
         for line in f:
             lineInfo = line.strip("\n").split("\t")
             if lineInfo[5] == "+":
@@ -137,9 +137,9 @@ def getDist2TTS(refParams=None, paGroup=None):
                 print >>out, "\t".join(map(str, [lineInfo[0], lineInfo[1], int(lineInfo[1])+1] + lineInfo[3:]))
         out.close()
     cmd = '''
-        bedtools closest -a <(sort -k1,1 -k2,2n pbPA.bed6) -b <(gpeFeature.pl --tts {}|
-        sort -k1,1 -k2,2n) -s -D a | select.pl -i 13,4 | sort -u | tee pbPA2TTS.tsv | 
-        cut -f1 | box.R -ng -nJ -no -y='Distance to TTS' -p=pbPA2TTS.pdf
+        bedtools closest -a <(sort -k1,1 -k2,2n lrPA.bed6) -b <(gpeFeature.pl --tts {}|
+        sort -k1,1 -k2,2n) -s -D a | select.pl -i 13,4 | sort -u | tee lrPA2TTS.tsv | 
+        cut -f1 | box.R -w=10 -ng -nJ -no -y='Distance to TTS' -p=lrPA2TTS.pdf
     '''.format(refParams.ref_gpe)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 

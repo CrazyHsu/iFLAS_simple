@@ -14,6 +14,7 @@ Option:
     Common:
     -p|pdf          FILE    The output figure in pdf[figure.pdf]
     -w|width        INT     The figure width
+    -height         INT     The figure height
     -m|main         STR     The main title
     -mainS          DOU     The size of main title[20 for ggplot]
     -x|xlab         STR     The xlab
@@ -276,6 +277,12 @@ for(i in 1:length(args)){
         args[i] = NA
         next
     }
+    tmp = parseArgAsNum(arg, 'height', 'height')
+    if(!is.null(tmp)){
+        height = tmp
+        args[i] = NA
+        next
+    }
     if(arg == '-ng' || arg == '-noGgplot'){
         noGgplot = TRUE
         args[i] = NA
@@ -334,8 +341,12 @@ for(i in 1:length(args)){
 args = args[!is.na(args)]
 if(length(args) < 2) stop('Please specify two input files at least')
 
-if(exists('width')){
-    pdf(myPdf, width = width)
+if(exists('width') && !exists('height')){
+    pdf(myPdf, width = width, height = width * 0.6)
+}else if(!exists('width') && exists('height')){
+    pdf(myPdf, width = height * 1.6, height = height)
+}else if(exists('width') && exists('height')){
+    pdf(myPdf, width = width, height = height)
 }else{
     pdf(myPdf)
 }

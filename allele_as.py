@@ -200,10 +200,10 @@ def allele_as(dataObj=None, refParams=None, dirSpec=None, args=None):
     collapsedGff = os.path.join(baseDir, "collapse", "tofu.collapsed.good.gff")
     isoformFile = os.path.join(baseDir, "refine", "isoformGrouped.bed12+")
 
-    seFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "SE.confident.bed12+")
-    irFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "IR.confident.bed6+")
-    a5ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "A5SS.confident.bed6+")
-    a3ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "PB", "A3SS.confident.bed6+")
+    seFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "SE.confident.bed12+")
+    irFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "IR.confident.bed6+")
+    a5ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "A5SS.confident.bed6+")
+    a3ssFile = os.path.join(baseDir, "as_events", "ordinary_as", "LR", "A3SS.confident.bed6+")
 
     seAsPairs = getASpairedIsoforms(seFile, collapsedGroupFile, isoformFile, asType="SE", filterByCount=2, mergeByJunc=False)
     irAsPairs = getASpairedIsoforms(irFile, collapsedGroupFile, isoformFile, asType="IR", filterByCount=2, mergeByJunc=False)
