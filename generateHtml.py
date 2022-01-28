@@ -138,8 +138,8 @@ def asPatternBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=No
             doc.stag("img", klass="img-responsive", src=spliceSitePlot)
 
 def lengthDistributionBlock(basicStatisticsDict, doc=None, tag=None, line=None, curDir=None):
-    lenDistBox = basicStatisticsDict["LengthDistribution"][1]
-    lenDistCurve = basicStatisticsDict["LengthDistribution"][2]
+    lenDistCurve = basicStatisticsDict["LengthDistribution"][1]
+    lenDistBox = basicStatisticsDict["LengthDistribution"][2]
     if validateFile(lenDistBox):
         with tag("div", klass="col-md-6"):
             line("h3", "The length distribution (box) of full-length reads")

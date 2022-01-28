@@ -73,16 +73,16 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
     subprocess.call(cmd, shell=True)
 
     gcAcrossRead(flncFx, "GC_across_raw_flnc_read.log")
-    cmd = '''cut -f2- GC_across_raw_flnc_read.log | {}/box.R -stack -nJ -ho=50 -m='GC Content across raw flnc Reads' -x=Interval -y=GC% -oS=0.5 -w=10 -p=GC_across_raw_flnc_read.pdf 2>/dev/null'''.format(utilDir)
+    cmd = '''cut -f2- GC_across_raw_flnc_read.log | {}/box.R -stack -nJ -ho=50 -m='GC Content across raw flnc Reads' -x=Interval -y=GC% -oS=0.5 -w=10 -height=6 -p=GC_across_raw_flnc_read.pdf 2>/dev/null'''.format(utilDir)
     subprocess.call(cmd, shell=True)
 
     cmd = "seqkit fx2tab -n -l {} | cut -f 2 > readsLength.lst".format(flncFx)
     subprocess.call(cmd, shell=True)
-    cmd = "{}/gpe2bed.pl {} | {}/bedLength.pl | cut -f 13 > referenceGeneLength.lst".format(utilDir, refParams.ref_gpe, utilDir)
+    cmd = "{}/gpe2bed.pl {} | {}/bedLength.pl | cut -f 13 > refGeneLength.lst".format(utilDir, refParams.ref_gpe, utilDir)
     subprocess.call(cmd, shell=True)
-    cmd = '''{}/distrCurves.R -x1=0 -x2=10000 -d -x='Binned Length (limited in 0-10000)' -w=10 *.lst -b=150 -p=LengthDistribution.curve.pdf 2>/dev/null'''.format(utilDir)
+    cmd = '''{}/distrCurves.R -lgPosX=0.85 -lgPosY=0.9 -x1=0 -x2=10000 -d -x='Binned Length (limited in 0-10000)' -w=10 *.lst -b=200 -p=LengthDistribution.curve.pdf 2>/dev/null'''.format(utilDir)
     subprocess.call(cmd, shell=True)
-    cmd = '''{}/boxes.R -ng -no *.lst -w=10 -p=LengthDistribution.box.pdf 2>/dev/null'''.format(utilDir)
+    cmd = '''{}/boxes.R -ng -no -xlab='Category' -ylab='The length distribution of reads/transcripts' *.lst -w=10 -p=LengthDistribution.box.pdf 2>/dev/null'''.format(utilDir)
     subprocess.call(cmd, shell=True)
 
     dataObj.ngs_junctions = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "rna-seq", "reassembly", "junctions.bed")

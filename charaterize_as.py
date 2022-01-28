@@ -143,7 +143,7 @@ def getDist2TTS(refParams=None, paGroup=None):
     cmd = '''
         bedtools closest -a <(sort -k1,1 -k2,2n lrPA.bed6) -b <({}/gpeFeature.pl --tts {}|
         sort -k1,1 -k2,2n) -s -D a | {}/select.pl -i 13,4 | sort -u | tee lrPA2TTS.tsv | 
-        cut -f1 | {}/box.R -w=10 -ng -nJ -no -y='Distance to TTS' -p=lrPA2TTS.pdf
+        cut -f1 | {}/box.R -w=10 -height=6 -ng -nJ -no -y='Distance to TTS' -p=lrPA2TTS.pdf
     '''.format(utilDir, utilDir, refParams.ref_gpe, utilDir)
     subprocess.call(cmd, shell=True, executable="/bin/bash")
 

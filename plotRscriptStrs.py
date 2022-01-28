@@ -21,14 +21,15 @@ plotReadsCorrectedEvalStr = '''
         p <- ggplot(rbind(rawMapped,correctMapped), aes(x=accuracy, fill=type)) + 
         geom_histogram(alpha=0.6, position = 'identity', binwidth=1) + 
         scale_fill_manual(values=c("#ff6666", "#C0C0C0")) + 
-        ggtitle("Reads Correction Evaluation") + xlab("Accuracy (%)") + 
+        ggtitle("Reads Correction Evaluation") + xlab("Accuracy (%)") + ylab("Count (x1e4)") +
         theme_bw() + 
-        theme(plot.title = element_text(hjust = 0.5, size=20), text = element_text(size=12), 
+        theme(plot.title = element_text(hjust = 0.5, size=20), text = element_text(size=20), 
               panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
               axis.line = element_line(colour = "black"), strip.background = element_blank(), 
               strip.text.x = element_blank(), legend.title = element_blank(), legend.text = element_text(size = 8), 
-              legend.key.size = unit(0.5, "cm"), panel.spacing = unit(0, "lines")) +
-        scale_y_continuous(labels = label_number(scale = 1 / 1e4))
+              legend.position=c(0.1, 0.9), legend.key.size = unit(0.5, "cm"), panel.spacing = unit(0, "lines")) +
+        scale_y_continuous(labels = label_number(scale = 1 / 1e4)) + 
+        scale_x_continuous(limitsc=c(50,100))
         print(p)
         dev.off()
     }
@@ -72,19 +73,21 @@ plotAsCountStatisticsStr = '''
     plotAsCountStatistics <- function(AsAnnotationFile, outPdf){
         as_anno_data <- read.csv(AsAnnotationFile, sep="\t")
         as_anno_data$AS_type <- factor(as_anno_data$AS_type, levels=c("SE", "A5SS", "A3SS", "IR", "APA", "PA"))
-        pdf(outPdf)
+        pdf(outPdf, height=6 ,width=10)
         p <- ggplot(as_anno_data, aes(x=Annotation, y=Count, fill=Annotation)) + 
             geom_bar(stat = 'identity') + 
             facet_grid(~ AS_type) + 
             coord_cartesian(xlim=c(0.8,2.2)) + 
-            theme_bw() + ggtitle("AS Type Statistics") + xlab("AS types") + 
+            theme_bw() + 
             scale_y_continuous(expand = c(0.02, 0), trans="log10") + 
             theme(plot.title = element_text(hjust = 0.5, size=20), panel.border = element_blank(), 
                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                  axis.line = element_line(colour = "black"), 
+                  axis.line = element_line(colour = "black"), text = element_text(size=20), 
+                  axis.ticks.x = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank(),
                   strip.background = element_blank(), legend.title = element_blank(), 
-                  legend.text = element_text(size = 8), legend.key.size = unit(0.5, "cm"), 
-                  panel.spacing = unit(0, "lines"))
+                  legend.text = element_text(size = 16), legend.key.size = unit(0.75, "cm"), 
+                  panel.spacing = unit(0, "lines")) + 
+            geom_text(aes(label = Count), vjust = 1, nudge_y=0.2, size=5)
         print(p)
         dev.off()
     }
@@ -98,17 +101,17 @@ plotAsDinucleotideStatisticsStr = '''
         as_splice_data[is.na(as_splice_data)] <- 0
         as_splice_data$AS_type <- factor(as_splice_data$AS_type, levels=c("SE", "A5SS", "A3SS", "IR"))
         as_splice_data$Category <- factor(as_splice_data$Category, levels=c("Inc", "Exc"))
-        pdf(outPdf)
+        pdf(outPdf, height=6 ,width=10)
         p <- ggplot(as_splice_data, aes(x=Category, y=Frequency, fill=Dinucleotide)) + 
             geom_bar(stat = 'identity') + 
             facet_grid(~ AS_type) + 
             coord_cartesian(xlim=c(0.8,2.2)) + 
-            theme_bw() + ggtitle("AS Dinucleotide Statistics") + xlab("AS types") + 
+            theme_bw() +
             scale_y_continuous(expand = c(0.02, 0)) + 
-            theme(panel.border = element_blank(), panel.grid.major = element_blank(), 
+            theme(panel.border = element_blank(), panel.grid.major = element_blank(), axis.title.x = element_blank(),
                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), 
-                  strip.background = element_blank(), legend.title = element_blank(), 
-                  legend.text = element_text(size = 8), legend.key.size = unit(0.5, "cm"), 
+                  strip.background = element_blank(), legend.title = element_blank(), text = element_text(size=20), 
+                  legend.text = element_text(size = 16), legend.key.size = unit(0.75, "cm"), 
                   panel.spacing = unit(0, "lines"))
         print(p)
         dev.off()
@@ -158,15 +161,17 @@ plotDiffASStr = '''
     library(ggplot2)
     plotDiffAS <- function(diffAsFile, outPdf){
         diffAS <- read.csv(diffAsFile, sep="\t")
-        pdf(outPdf)
+        pdf(outPdf, height=6 ,width=10)
         p <- ggplot(diffAS, aes(x=AS_type, y=Count, fill=AS_type)) + geom_bar(stat = 'identity') + 
-            theme_bw() + ggtitle("Diff AS Type Statistics") + xlab("AS types") + 
+            # theme_bw() + ggtitle("Diff AS Type Statistics") + xlab("AS types") + 
+            theme_bw() + xlab("AS types") +
             scale_y_continuous(expand = c(0.02, 0)) + 
             theme(plot.title = element_text(hjust = 0.5, size=20),
                 panel.border = element_blank(), panel.grid.major = element_blank(), 
                 panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), 
+                axis.text = element_text(size=20), axis.title = element_text(size=20),
                 strip.background = element_blank(), strip.text.x = element_blank(), legend.title = element_blank(), 
-                legend.text = element_text(size = 8), legend.key.size = unit(0.5, "cm"), 
+                legend.text = element_text(size = 16), legend.key.size = unit(0.75, "cm"), 
                 panel.spacing = unit(0, "lines"))
         print(p)
         dev.off()
@@ -189,7 +194,7 @@ plotTargetGenesGoEnrichmentStr = '''
         go2term <- unique(toTable(GOTERM)[,c(1,3)])
         go2gene <- gene2go[,c(2,1)]
         names(targetGeneFiles) <- sampleNames
-        outPdf <- paste0(outName, ".goEnrichResults.pdf")
+        outPdf <- paste0(outName, ".goEnrichResults.pdf", width=10, height=8)
         if(length(sampleNames)>1){
             r_bind <- data.frame()
             for (i in seq(length(targetGeneFiles))){
