@@ -29,7 +29,7 @@ plotReadsCorrectedEvalStr = '''
               strip.text.x = element_blank(), legend.title = element_blank(), legend.text = element_text(size = 8), 
               legend.position=c(0.1, 0.9), legend.key.size = unit(0.5, "cm"), panel.spacing = unit(0, "lines")) +
         scale_y_continuous(labels = label_number(scale = 1 / 1e4)) + 
-        scale_x_continuous(limitsc=c(50,100))
+        scale_x_continuous(limits=c(50,101))
         print(p)
         dev.off()
     }

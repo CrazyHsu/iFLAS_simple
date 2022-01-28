@@ -82,7 +82,7 @@ def reportReadsContentEval(dataObj=None, refParams=None, dirSpec=None):
     subprocess.call(cmd, shell=True)
     cmd = '''{}/distrCurves.R -lgPosX=0.85 -lgPosY=0.9 -x1=0 -x2=10000 -d -x='Binned Length (limited in 0-10000)' -w=10 *.lst -b=200 -p=LengthDistribution.curve.pdf 2>/dev/null'''.format(utilDir)
     subprocess.call(cmd, shell=True)
-    cmd = '''{}/boxes.R -ng -no -xlab='Category' -ylab='The length distribution of reads/transcripts' *.lst -w=10 -p=LengthDistribution.box.pdf 2>/dev/null'''.format(utilDir)
+    cmd = '''{}/boxes.R -ng -no -xlab='Category' -ylab='Length of reads or transcripts' *.lst -w=10 -p=LengthDistribution.box.pdf 2>/dev/null'''.format(utilDir)
     subprocess.call(cmd, shell=True)
 
     dataObj.ngs_junctions = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "rna-seq", "reassembly", "junctions.bed")

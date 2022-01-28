@@ -366,8 +366,9 @@ if(exists('noGgplot')){
     if(exists('main')) myCmd = paste0(myCmd, ', main = main')
     if(exists('xLab')) myCmd = paste0(myCmd, ', xlab = xLab')
     if(exists('yLab')) myCmd = paste0(myCmd, ', ylab = yLab')
-    myCmd = paste0(myCmd, ', cex.axis = mainS * 0.1',)
-    myCmd = paste0(myCmd, ', cex.lab = mainS * 0.15')
+    myCmd = paste0(myCmd, ', cex.axis = mainS * 0.1')
+    myCmd = paste0(myCmd, ', cex.lab = mainS * 0.1')
+    myCmd = paste0(myCmd, ', pars=list(par(mar=c(5,5,2,2)))')
     myCmd = paste0(myCmd, ')')
     eval(parse(text = myCmd))
 }else{
