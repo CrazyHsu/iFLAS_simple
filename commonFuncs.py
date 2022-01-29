@@ -580,6 +580,9 @@ def validateFaAndFqFile(myFile):
 
 
 def validateFile(myFile):
+    if isinstance(myFile, list):
+        return False
+
     if not os.path.exists(myFile):
         return False
 

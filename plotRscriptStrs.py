@@ -23,11 +23,11 @@ plotReadsCorrectedEvalStr = '''
         scale_fill_manual(values=c("#ff6666", "#C0C0C0")) + 
         ggtitle("Reads Correction Evaluation") + xlab("Accuracy (%)") + ylab("Count (x1e4)") +
         theme_bw() + 
-        theme(plot.title = element_text(hjust = 0.5, size=20), text = element_text(size=20), 
+        theme(plot.title = element_text(hjust = 0.5, size=28), text = element_text(size=28), 
               panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-              axis.line = element_line(colour = "black"), strip.background = element_blank(), 
-              strip.text.x = element_blank(), legend.title = element_blank(), legend.text = element_text(size = 8), 
-              legend.position=c(0.1, 0.9), legend.key.size = unit(0.5, "cm"), panel.spacing = unit(0, "lines")) +
+              axis.line = element_line(colour = "black"), strip.background = element_blank(), axis.text = element_line(size=24),
+              strip.text.x = element_blank(), legend.title = element_blank(), legend.text = element_text(size = 24), 
+              legend.position=c(0.1, 0.9), legend.key.size = unit(1, "cm"), panel.spacing = unit(0, "lines")) +
         scale_y_continuous(labels = label_number(scale = 1 / 1e4)) + 
         scale_x_continuous(limits=c(50,101))
         print(p)
@@ -80,12 +80,12 @@ plotAsCountStatisticsStr = '''
             coord_cartesian(xlim=c(0.8,2.2)) + 
             theme_bw() + 
             scale_y_continuous(expand = c(0.02, 0), trans="log10") + 
-            theme(plot.title = element_text(hjust = 0.5, size=20), panel.border = element_blank(), 
+            theme(plot.title = element_text(hjust = 0.5, size=28), panel.border = element_blank(), 
                   panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                  axis.line = element_line(colour = "black"), text = element_text(size=20), 
+                  axis.line = element_line(colour = "black"), text = element_text(size=28), 
                   axis.ticks.x = element_blank(), axis.text.x = element_blank(), axis.title.x = element_blank(),
                   strip.background = element_blank(), legend.title = element_blank(), 
-                  legend.text = element_text(size = 16), legend.key.size = unit(0.75, "cm"), 
+                  legend.text = element_text(size = 24), legend.key.size = unit(1, "cm"), 
                   panel.spacing = unit(0, "lines")) + 
             geom_text(aes(label = Count), vjust = 1, nudge_y=0.2, size=5)
         print(p)
@@ -110,8 +110,8 @@ plotAsDinucleotideStatisticsStr = '''
             scale_y_continuous(expand = c(0.02, 0)) + 
             theme(panel.border = element_blank(), panel.grid.major = element_blank(), axis.title.x = element_blank(),
                   panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"), 
-                  strip.background = element_blank(), legend.title = element_blank(), text = element_text(size=20), 
-                  legend.text = element_text(size = 16), legend.key.size = unit(0.75, "cm"), 
+                  strip.background = element_blank(), legend.title = element_blank(), text = element_text(size=28), 
+                  legend.text = element_text(size = 24), legend.key.size = unit(1, "cm"), 
                   panel.spacing = unit(0, "lines"))
         print(p)
         dev.off()
