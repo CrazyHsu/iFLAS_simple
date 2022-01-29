@@ -211,6 +211,8 @@ def generateMainPage(reportDict):
                                 text(description)
                             workflow_png = "assets/src/iFLAS_workflow.png"
                             doc.stag("img", klass="img-responsive", src=workflow_png)
+                with tag("div", klass="footer"):
+                    pass
             line("script", "", src="assets/js/jquery.min.js")
             line("script", "", src="assets/js/bootstrap.min.js")
             line("script", "", src="assets/js/iflas.js")
@@ -346,6 +348,8 @@ def generateAllSampleMergedPage(reportDict):
                                 curDir = os.path.join(os.getcwd(), "allSampleMerged")
                                 geneStrucBlock(reportDict["allSampleMerged"][gene], gene=gene, doc=doc, line=line,
                                                curDir=curDir)
+                        with tag("div", klass="footer"):
+                            pass
 
                 line("script", "", src="../assets/js/jquery.min.js")
                 line("script", "", src="../assets/js/bootstrap.min.js")
@@ -455,6 +459,8 @@ def generateDasPage(reportDict):
                                     generateTable(dasDict["goEnrichResults"], tableType="goEnrichment", doc=doc, tag=tag,
                                                   text=text, line=line)
                         doc.asis("<hr>")
+                    with tag("div", klass="footer"):
+                        pass
 
                 line("script", "", src="../assets/js/jquery.min.js")
                 line("script", "", src="../assets/js/bootstrap.min.js")
@@ -522,6 +528,8 @@ def generateSingleSampleStatisticsPage(reportDict):
                         if "asPattern" in basicStatisticsDict:
                             with tag("div", klass="row"):
                                 asPatternBlock(basicStatisticsDict, doc=doc, tag=tag, line=line, curDir=curDir)
+                    with tag("div", klass="footer"):
+                        pass
 
                 line("script", "", src="../assets/js/jquery.min.js")
                 line("script", "", src="../assets/js/bootstrap.min.js")
@@ -598,6 +606,8 @@ def generateSingleSampleGenePage(reportDict):
                                     with tag("div", klass="col"):
                                         paTailLenApaBlock(reportDict[tmpSample]["genes"][gene]["palenAPA"], doc=doc,
                                                           tag=tag, line=line, curDir=curDir)
+                    with tag("div", klass="footer"):
+                        pass
 
                     line("script", "", src="../assets/js/jquery.min.js")
                     line("script", "", src="../assets/js/bootstrap.min.js")

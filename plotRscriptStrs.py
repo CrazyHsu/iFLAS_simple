@@ -25,9 +25,9 @@ plotReadsCorrectedEvalStr = '''
         theme_bw() + 
         theme(plot.title = element_text(hjust = 0.5, size=28), text = element_text(size=28), 
               panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-              axis.line = element_line(colour = "black"), strip.background = element_blank(), axis.text = element_line(size=24),
+              axis.line = element_line(colour = "black"), strip.background = element_blank(), axis.text = element_text(size=24),
               strip.text.x = element_blank(), legend.title = element_blank(), legend.text = element_text(size = 24), 
-              legend.position=c(0.1, 0.9), legend.key.size = unit(1, "cm"), panel.spacing = unit(0, "lines")) +
+              legend.position=c(0.2, 0.8), legend.key.size = unit(1, "cm"), panel.spacing = unit(0, "lines")) +
         scale_y_continuous(labels = label_number(scale = 1 / 1e4)) + 
         scale_x_continuous(limits=c(50,101))
         print(p)
