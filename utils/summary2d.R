@@ -152,7 +152,7 @@ if(exists('noGgplot')){
     }
     if(exists('main')) p = p + ggtitle(main)
     p = p + theme(plot.title = element_text(size = mainS, hjust = 0.5))
-    if(exists('xLab')) p = p + xlab(xLab) + theme(axis.title.x = element_text(size = mainS*0.8), axis.text.x = element_text(size = mainS*0.7), legend.text = element_text(size = mainS*0.7))
-    if(exists('yLab')) p = p + ylab(yLab) + theme(axis.title.y = element_text(size = mainS*0.8), axis.text.y = element_text(size = mainS*0.7), legend.text = element_text(size = mainS*0.7))
+    if(exists('xLab')) p = p + xlab(xLab) + theme(axis.title.x = element_text(size = mainS*0.8), axis.text.x = element_text(size = mainS*0.7), legend.text = element_text(size = mainS*0.7), legend.title = element_text(size = mainS*0.7))
+    if(exists('yLab')) p = p + ylab(yLab) + theme(axis.title.y = element_text(size = mainS*0.8), axis.text.y = element_text(size = mainS*0.7), legend.text = element_text(size = mainS*0.7), legend.title = element_text(size = mainS*0.7))
     p
 }
