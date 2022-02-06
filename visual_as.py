@@ -107,12 +107,12 @@ def parallelPlotter(gene, gpeTargetGenePickle, sampleTargetGenePickle, dataObjs,
     os.system("gene_model_to_splicegraph.py -m {} -o {} 2>/dev/null".format(geneModelGTF, geneModelGFF))
     geneModelHidePlot = PlotSection(section_name="[GeneModelGraph]", source_file=geneModelGTF,
                                     gene_name=gene, relative_size=5.0,
-                                    title_string="Gene Model for %gene", hide=True)
+                                    title_string="Gene model for %gene", hide=True)
     geneModelItemCount = getFileRowCounts(geneModelGPE)
     geneModelRelativeSize = resizeTrackRatio(geneModelItemCount)
     geneModelVisiblePlot = PlotSection(section_name="[GeneModelIsoformsGraph]", plot_type="isoforms",
                                        source_file=geneModelGFF, relative_size=geneModelRelativeSize,
-                                       title_string="Gene Model for %gene [{}({})]".format(
+                                       title_string="Gene model for %gene [{}({})]".format(
                                            targetGeneRegion, targetGeneStrand))
 
     # Corrected tgs reads from the pipeline
@@ -131,7 +131,7 @@ def parallelPlotter(gene, gpeTargetGenePickle, sampleTargetGenePickle, dataObjs,
     postCorrIsoPlotType = "splice_graph"
     postCorrIsoPlot = PlotSection(section_name="[AllReadsCollapse]", plot_type=postCorrIsoPlotType,
                                   source_file=postCorrIsoGFF, relative_size=postCorrIsoRelativeSize,
-                                  title_string="Corrected isoforms and AS events in %s from TGS data" % gene)
+                                  title_string="Corrected isoforms and AS events in %s from long reads data" % gene)
 
 
     figOut = gene + ".pdf"
@@ -154,7 +154,7 @@ def parallelPlotter(gene, gpeTargetGenePickle, sampleTargetGenePickle, dataObjs,
             cmd = "samtools view -h {} {} > {}".format(bamFile, targetGeneRegion, targetSam)
             subprocess.call(cmd, shell=True)
             targetDepth = "{}.{}.depth".format(repeatName, gene)
-            cmd = "sam_to_depths.py {} -o {}".format(targetSam, targetDepth)
+            cmd = "sam_to_depths.py {} -o {} 2>/dev/null".format(targetSam, targetDepth)
             subprocess.call(cmd, shell=True)
             if juncDict:
                 tmpOut = open("tmp.depth", "w")
@@ -172,10 +172,10 @@ def parallelPlotter(gene, gpeTargetGenePickle, sampleTargetGenePickle, dataObjs,
             ngsSams.append(targetSam)
             depthPlot = PlotSection(section_name="[Reads_junc_{}_{}]".format(repeatName, sampleName),
                                     plot_type="junctions", source_file=targetDepth, relative_size=5.0,
-                                    min_coverage=10, title_string="%s Junction Depth in sample %s" % (gene, repeatName))
+                                    min_coverage=10, title_string="%s junction depth in sample %s" % (gene, repeatName))
             readsPlot = PlotSection(section_name="[Reads_%s]" % (repeatName), plot_type="read_depth",
                                     source_file=targetSam, relative_size=5.0,
-                                    title_string="%s Read Coverage in sample %s" % (gene, repeatName))
+                                    title_string="%s read coverage in sample %s" % (gene, repeatName))
             print >> cfgOut, readsPlot.printStr()
             print >> cfgOut, depthPlot.printStr()
 
@@ -252,13 +252,13 @@ def visual_as_merge(dataToProcess=None, targetGenes=None, refParams=None, dirSpe
             sectionToPlot = []
             geneModelHidePlot = PlotSection(section_name="[GeneModelGraph]", source_file=geneModelGTF,
                                             gene_name=geneName, relative_size=5.0,
-                                            title_string="Gene Model for %gene", hide=True)
+                                            title_string="Gene model for %gene", hide=True)
             sectionToPlot.append(geneModelHidePlot)
             geneModelItemCount = getFileRowCounts(geneModelGPE)
             geneModelRelativeSize = resizeTrackRatio(geneModelItemCount)
             geneModelVisiblePlot = PlotSection(section_name="[GeneModelIsoformsGraph]", plot_type="isoforms",
                                                source_file=geneModelGFF, relative_size=geneModelRelativeSize,
-                                               title_string="Gene Model for %gene [{}({})]".format(
+                                               title_string="Gene model for %gene [{}({})]".format(
                                                    targetGeneRegion, targetGeneStrand))
             sectionToPlot.append(geneModelVisiblePlot)
             isoItemCounts = 0
@@ -276,12 +276,12 @@ def visual_as_merge(dataToProcess=None, targetGenes=None, refParams=None, dirSpe
                     ngsDepth = tmpSample["ngs"][repeatName][1]
                     depthPlot = PlotSection(section_name="[Reads_junc_{}_{}]".format(repeatName, sampleName),
                                             plot_type="junctions", source_file=ngsDepth, relative_size=5.0, min_coverage=10,
-                                            title_string="{} Junction Depth in {} {}".format(geneName, sampleName, repeatName))
+                                            title_string="{} junction depth in {} {}".format(geneName, sampleName, repeatName))
                     sectionToPlot.append(depthPlot)
                     ngsSam = tmpSample["ngs"][repeatName][0]
                     ngsPlot = PlotSection(section_name="[Reads_{}_{}]".format(repeatName, sampleName), plot_type="read_depth",
                                           source_file=ngsSam, relative_size=5.0,
-                                          title_string="{} Read Coverage in {} {}".format(geneName, sampleName, repeatName))
+                                          title_string="{} read coverage in {} {}".format(geneName, sampleName, repeatName))
                     sectionToPlot.append(ngsPlot)
             figOut = geneName + ".pdf"
             cfgOut = open(geneName + ".cfg", "w")

@@ -54,7 +54,7 @@ def geneStrucBlock(isoformStrucFile, gene, doc=None, line=None, curDir=None):
 
 def alleleAsBlock(alleleAsFile, doc=None, tag=None, line=None, curDir=None):
     if validateFile(alleleAsFile):
-        line("h1", "Allele-specific Alternative splicing")
+        line("h1", "Allele-specific alternative splicing")
         alleleAsFile = getRelPath(alleleAsFile, targetDir=curDir)
         doc.stag("img", klass="img-responsive", src=alleleAsFile)
 
@@ -561,7 +561,8 @@ def generateSingleSampleGenePage(reportDict):
     for tmpSample in newKeys:
         if tmpSample == "das" or tmpSample == "allSampleMerged": continue
         if "genes" not in reportDict[tmpSample]: continue
-        for gene in reportDict[tmpSample]["genes"]:
+        allGenes = sorted(reportDict[tmpSample]["genes"])
+        for gene in allGenes:
             resolveDir(tmpSample, chdir=False)
             curDir = os.path.join(os.getcwd(), tmpSample)
             out = open(os.path.join(tmpSample, gene + ".html"), "w")
@@ -594,18 +595,18 @@ def generateSingleSampleGenePage(reportDict):
                             if "alleleAS" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
-                                        alleleAsBlock(reportDict[tmpSample]["genes"][gene]["alleleAS"], doc=doc,
-                                                      tag=tag, line=line, curDir=curDir)
+                                        for i in reportDict[tmpSample]["genes"][gene]["alleleAS"]:
+                                            alleleAsBlock(i, doc=doc, tag=tag, line=line, curDir=curDir)
                             if "palenAsPlots" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
-                                        paTailLenAsBlock(reportDict[tmpSample]["genes"][gene]["palenAsPlots"], doc=doc,
-                                                         tag=tag, line=line, curDir=curDir)
+                                        for i in reportDict[tmpSample]["genes"][gene]["palenAsPlots"]:
+                                            paTailLenAsBlock(i, doc=doc, tag=tag, line=line, curDir=curDir)
                             if "palenAPA" in reportDict[tmpSample]["genes"][gene]:
                                 with tag("div", klass="row"):
                                     with tag("div", klass="col"):
-                                        paTailLenApaBlock(reportDict[tmpSample]["genes"][gene]["palenAPA"], doc=doc,
-                                                          tag=tag, line=line, curDir=curDir)
+                                        for i in reportDict[tmpSample]["genes"][gene]["palenAPA"]:
+                                            paTailLenApaBlock(i, doc=doc, tag=tag, line=line, curDir=curDir)
                     with tag("div", klass="footer"):
                         pass
 
@@ -744,17 +745,18 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 gene = os.path.basename(i)
                 plotPath = convertPdf2png(inPdf=os.path.join(i, "{}.pdf".format(gene)), outDir=geneStrucReportDir)
                 if gene not in resultDict[sampleName]["genes"]:
-                    resultDict[sampleName]["genes"] = {gene: {"isoformStruc": plotPath}}
+                    resultDict[sampleName]["genes"].update({gene: {"isoformStruc": plotPath}})
                 else:
                     resultDict[sampleName]["genes"][gene].update({"isoformStruc": plotPath})
 
         alleleAsDir = os.path.join(subReportDir, "alleleAsPlots")
         if os.path.exists(alleleAsDir):
             for i in glob.glob(os.path.join(alleleAsDir, "*.pdf")):
+                if i == "alleleAS.pdf": continue
                 gene = os.path.basename(i).split(".")[0]
                 plotPath = convertPdf2png(inPdf=i)
                 if gene not in resultDict[sampleName]["genes"]:
-                    resultDict[sampleName]["genes"] = {gene: {"alleleAS": [plotPath]}}
+                    resultDict[sampleName]["genes"].update({gene: {"alleleAS": [plotPath]}})
                 elif "alleleAS" not in resultDict[sampleName]["genes"][gene]:
                     resultDict[sampleName]["genes"][gene] = {"alleleAS": [plotPath]}
                 else:
@@ -766,7 +768,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 gene = os.path.basename(i).split(".palenAndAS.pdf")[0]
                 plotPath = convertPdf2png(inPdf=i)
                 if gene not in resultDict[sampleName]["genes"]:
-                    resultDict[sampleName]["genes"] = {gene: {"palenAS": [plotPath]}}
+                    resultDict[sampleName]["genes"].update({gene: {"palenAS": [plotPath]}})
                 elif "palenAS" not in resultDict[sampleName]["gene"][gene]:
                     resultDict[sampleName]["gene"][gene] = {"palenAS": [plotPath]}
                 else:
@@ -778,7 +780,7 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 gene = os.path.basename(i).split(".palenAndAS.pdf")[0]
                 plotPath = convertPdf2png(inPdf=i)
                 if gene not in resultDict[sampleName]["genes"]:
-                    resultDict[sampleName]["genes"] = {gene: {"palenAPA": [plotPath]}}
+                    resultDict[sampleName]["genes"].update({gene: {"palenAPA": [plotPath]}})
                 elif "palenAPA" not in resultDict[sampleName]["gene"][gene]:
                     resultDict[sampleName]["gene"][gene] = {"palenAPA": [plotPath]}
                 else:

@@ -21,7 +21,7 @@ plotReadsCorrectedEvalStr = '''
         p <- ggplot(rbind(rawMapped,correctMapped), aes(x=accuracy, fill=type)) + 
         geom_histogram(alpha=0.6, position = 'identity', binwidth=1) + 
         scale_fill_manual(values=c("#ff6666", "#C0C0C0")) + 
-        ggtitle("Reads Correction Evaluation") + xlab("Accuracy (%)") + ylab("Count (x1e4)") +
+        xlab("Accuracy (%)") + ylab("Count (x1e4)") +
         theme_bw() + 
         theme(plot.title = element_text(hjust = 0.5, size=28), text = element_text(size=28), 
               panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
@@ -57,12 +57,13 @@ plotAlleleAsStructureStr = '''
         htStarts <- as.numeric(unlist(strsplit(htStarts, ","))) - 50
         htEnds <- as.numeric(unlist(strsplit(htEnds, ","))) + 50
         ht <- HighlightTrack(trackList=list(haploIso1Track, haploReads1Track, haploIso2Track, haploReads2Track), start=htStarts, end=htEnds, chromosome=chrom, col=c(color), alpha=0.8)
+        mainTitle <- basename(outName)
         if(ngsBam!=""){
             # ngsCovTrack <- AlignmentsTrack(ngsBam, isPaired = TRUE, min.height = 20, size = 80, type="coverage", name="Short Reads Alignments")
             # plotTracks(c(covTrack, ngsCovTrack, ht, sTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, cex=0.5, min.height=2, fontsize=10, extend.left=0.02, extend.right=0.02, main=outName, cex.main=1)
-            plotTracks(c(covTrack, ht, sTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=outName, cex.main=1, sizes=c(0.05,0.1,0.35,0.1,0.35,0.025,0.025))
+            plotTracks(c(covTrack, ht, sTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=mainTitle, cex.main=1, sizes=c(0.05,0.1,0.35,0.1,0.35,0.025,0.025))
         }else{
-            plotTracks(c(covTrack, ht, sTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=outName, cex.main=1, sizes=c(0.05,0.1,0.35,0.1,0.35,0.025,0.025))
+            plotTracks(c(covTrack, ht, sTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=mainTitle, cex.main=1, sizes=c(0.05,0.1,0.35,0.1,0.35,0.025,0.025))
         }
         dev.off()
     }
