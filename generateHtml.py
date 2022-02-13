@@ -18,7 +18,24 @@ from collections import Counter
 from commonFuncs import *
 
 
+################# Classes ####################
+class MakeDict(object):
+    def __init__(self, title, url):
+        self.title = title
+        self.url = url
+
+    def toDict(self):
+        return dict([("title", self.title), ("url", self.url)])
+
+
 ################# Functions ##################
+def printJson(myDict, outfile=None, indent=4):
+    import json
+    out = open(outfile, "w")
+    print >>out, json.dumps(myDict, indent=indent)
+    out.close()
+
+
 def getRelPath(myPath, targetPath=None, targetDir=None):
     if targetPath and targetDir: return
     if targetPath:
@@ -222,6 +239,7 @@ def generateMainPage(reportDict):
     res = indent(doc.getvalue(), indentation="    ")
     mainPageOut.write(res)
     mainPageOut.close()
+    return MakeDict("mainPage", os.path.join(os.getcwd(), "iflas_report.html")).toDict()
 
 
 def getSideBar(reportDict, sample=None, gene=None, basicStatistics=False, das=False, dasComp=None, doc=None, tag=None,
@@ -318,6 +336,7 @@ def getSideBar(reportDict, sample=None, gene=None, basicStatistics=False, das=Fa
 
 
 def generateAllSampleMergedPage(reportDict):
+    dataList = []
     for gene in reportDict["allSampleMerged"]:
         resolveDir("allSampleMerged", chdir=False)
         out = open(os.path.join("allSampleMerged", gene + ".html"), "w")
@@ -370,9 +389,12 @@ def generateAllSampleMergedPage(reportDict):
         res = indent(doc.getvalue(), indentation="    ")
         out.write(res)
         out.close()
+        dataList.append(MakeDict("merged sample for {}".format(gene), os.path.join(os.getcwd(), "allSampleMerged", gene + ".html")).toDict())
+    return dataList
 
 
 def generateDasPage(reportDict):
+    dataList = []
     for tmpSample in reportDict["das"]:
         dasDict = reportDict["das"][tmpSample]
         resolveDir("das", chdir=False)
@@ -481,9 +503,12 @@ def generateDasPage(reportDict):
         res = indent(doc.getvalue(), indentation="    ")
         out.write(res)
         out.close()
+        dataList.append(MakeDict("differential alternavive spliced page for {}".format(tmpSample), os.path.join(os.getcwd(), "das", tmpSample + ".html")).toDict())
+    return dataList
 
 
 def generateSingleSampleStatisticsPage(reportDict):
+    dataList = []
     keys = reportDict.keys()
     newKeys = [x for x in keys if x != "das" and x != "allSampleMerged"]
     count = 0
@@ -552,17 +577,20 @@ def generateSingleSampleStatisticsPage(reportDict):
         out.close()
 
         count += 1
+        dataList.append(MakeDict("basic statistics page for {}".format(tmpSample), os.path.join(os.getcwd(), tmpSample, "basicStatistics.html")).toDict())
+    return dataList
 
 
 def generateSingleSampleGenePage(reportDict):
+    dataList = []
     keys = reportDict.keys()
     newKeys = [x for x in keys if x != "das" and x != "allSampleMerged"]
     count = 0
     for tmpSample in newKeys:
         if tmpSample == "das" or tmpSample == "allSampleMerged": continue
         if "genes" not in reportDict[tmpSample]: continue
-        allGenes = sorted(reportDict[tmpSample]["genes"])
-        for gene in allGenes:
+        # allGenes = sorted(reportDict[tmpSample]["genes"])
+        for gene in reportDict[tmpSample]["genes"]:
             resolveDir(tmpSample, chdir=False)
             curDir = os.path.join(os.getcwd(), tmpSample)
             out = open(os.path.join(tmpSample, gene + ".html"), "w")
@@ -629,7 +657,9 @@ def generateSingleSampleGenePage(reportDict):
             res = indent(doc.getvalue(), indentation="    ")
             out.write(res)
             out.close()
+            dataList.append(MakeDict("single gene page of {} for {}".format(gene, tmpSample), os.path.join(os.getcwd(), tmpSample, gene + ".html")).toDict())
         count += 1
+    return dataList
 
 
 def convertPdf2png(inPdf=None, outDir=None, pageIndex=0):
@@ -770,21 +800,21 @@ def retrieveResults(dataToProcess, dirSpec, optionTools, args):
                 if gene not in resultDict[sampleName]["genes"]:
                     resultDict[sampleName]["genes"].update({gene: {"palenAS": [plotPath]}})
                 elif "palenAS" not in resultDict[sampleName]["gene"][gene]:
-                    resultDict[sampleName]["gene"][gene] = {"palenAS": [plotPath]}
+                    resultDict[sampleName]["genes"][gene] = {"palenAS": [plotPath]}
                 else:
-                    resultDict[sampleName]["gene"][gene]["palenAS"].append(plotPath)
+                    resultDict[sampleName]["genes"][gene]["palenAS"].append(plotPath)
 
         palenApaDir = os.path.join(subReportDir, "palenApaPlots")
         if os.path.exists(palenApaDir):
             for i in glob.glob(os.path.join(palenApaDir, "*.pdf")):
-                gene = os.path.basename(i).split(".palenAndAS.pdf")[0]
+                gene = os.path.basename(i).split(".palenAndAPA.pdf")[0]
                 plotPath = convertPdf2png(inPdf=i)
                 if gene not in resultDict[sampleName]["genes"]:
                     resultDict[sampleName]["genes"].update({gene: {"palenAPA": [plotPath]}})
                 elif "palenAPA" not in resultDict[sampleName]["gene"][gene]:
-                    resultDict[sampleName]["gene"][gene] = {"palenAPA": [plotPath]}
+                    resultDict[sampleName]["genes"][gene] = {"palenAPA": [plotPath]}
                 else:
-                    resultDict[sampleName]["gene"][gene]["palenAPA"].append(plotPath)
+                    resultDict[sampleName]["genes"][gene]["palenAPA"].append(plotPath)
 
     mergedGeneStrucDir = os.path.join(dirSpec.out_dir, "isoViewer_sample_merged")
     if os.path.exists(mergedGeneStrucDir):
@@ -867,13 +897,20 @@ def generateHtml(dataToProcess, dirSpec, optionTools, args):
     #                                                  "palenAsPlots": "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/test.pdf",
     #                                                  "palenAPA": "/home/xufeng/xufeng/iso-seq/iFLAS_toolkit/test_data/iflas_html/test.pdf",}}},
     #               }
-    generateMainPage(resultDict)
+
+    dataList = []
+    dataList.append(generateMainPage(resultDict))
     if "allSampleMerged" in resultDict:
-        generateAllSampleMergedPage(resultDict)
-    generateSingleSampleStatisticsPage(resultDict)
-    generateSingleSampleGenePage(resultDict)
+        dataList.extend(generateAllSampleMergedPage(resultDict))
+    dataList.extend(generateSingleSampleStatisticsPage(resultDict))
+    dataList.extend(generateSingleSampleGenePage(resultDict))
     if "das" in resultDict:
-        generateDasPage(resultDict)
+        dataList.extend(generateDasPage(resultDict))
+
+    jsonDict = {"code": 0, "data": dataList}
+    resolveDir(os.path.join(dirSpec.out_dir, "reports", "json"), chdir=False)
+    jsonFile = os.path.join(dirSpec.out_dir, "reports", "json", "search.json")
+    printJson(jsonDict, outfile=jsonFile, indent=4)
 
     print getCurrentTime() + " End generating html report!"
 

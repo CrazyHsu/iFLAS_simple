@@ -715,4 +715,96 @@ plotPaTailAsStructure <- function(sigFile){
 }
 
 
+library(rtracklayer)
+library(GenomicFeatures)
+library(Gviz)
+library(dplyr)
+library(tidyr)
+library(ggpubr)
+
+# refGtfDb <- makeTxDbFromGFF(refGtf, format = "gtf")
+# refGtfTrack <- GeneRegionTrack(refGtfDb, name="Gene model", transcriptAnnotation = "transcript", stackHeight = 0.5)
+plotPaTailApaStructure <- function(geneName, paSite, paLenList, countList, alignBam, chrom, chromStart, chromEnd) {
+    options(ucscChromosomeNames=FALSE)
+    # paSite <- "5_219996865;5_219996411;5_219996798;5_219996731"
+    # paLenList <- "153.34,203.23;207.72,91.68;139.23,76.96;238.39,111"
+    # countList <- "10;50;16;15"
+    paSite <- unlist(strsplit(paSite, ";"))
+    paLenList <- unlist(strsplit(paLenList, ";"))
+    countList <- unlist(strsplit(countList, ";"))
+    apaList <- paste0("APA", seq(length(paSite)))
+    paLenData <- data.frame(paSite=paSite, apa=apaList, paLen=paLenList, count=countList, stringsAsFactors = FALSE)
+    s <- strsplit(paLenData$paLen, split = ",")
+    paLenData <- data.frame(paSite = rep(paLenData$paSite, sapply(s, length)), apa=rep(paLenData$apa, sapply(s, length)), count=rep(paLenData$count, sapply(s, length)), paLen = unlist(s), stringsAsFactors = FALSE)
+    paLenData$apa <- factor(paLenData$apa)
+    paLenData$count <- as.numeric(paLenData$count)
+    paLenData$paLen <- as.numeric(paLenData$paLen)
+    
+    paLenData <- paLenData %>% separate(paSite, c("chrom", "paSite"), "_")
+    paLenData$paSite <- as.numeric(paLenData$paSite)
+    paLenData$paEnd <- paLenData$paSite + 1
+    paBedGraph <- unique(paLenData[, c("chrom", "paSite", "paEnd", "count")])
+    bgFile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".bedGraph")
+    write.table(paBedGraph, file=bgFile, quote = F, row.names = F, col.names = F, sep="\t")
+    
+
+    if (length(levels(paLenData$apa)) < 3){
+        colors = brewer.pal(3, "Set1")
+    }else{
+        colors = brewer.pal(length(levels(paLenData$apa)), "Set1")
+    }
+    labelColor <- colors[paLenData$apa]
+    
+
+    gtrack <- GenomeAxisTrack(cex = 1)
+    covTrack <- AlignmentsTrack(alignBam, isPaired = FALSE, type="coverage", name="Coverage")
+    bgTrack <- DataTrack(range = bgFile, type = "hist", name = "APA support")
+    annoTrack <- AnnotationTrack(start = unique(paLenData$paSite), width=15, 
+                                 chromosome = chrom, id = unique(paLenData$apa), name = "", col="white", 
+                                 fill="white", fontcolor.feature="black")
+    
+    outPdf <- checkFileExists(geneName, ".palenAndAPA.pdf", 0)
+    pdf(outPdf, useDingbats=FALSE)
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(2, 1, heights=c(0.5,0.5))))
+    pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+    plotTracks(c(covTrack, bgTrack, annoTrack, refGtfTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, 
+                 cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=mainTitle, cex.main=1, 
+                 featureAnnotation = "id", sizes=c(0.1,0.05,0.05,0.2, 0.1), add=TRUE)
+    popViewport(1)
+    
+    
+    paLenData$color <- as.factor(labelColor)
+    maxPaLen <- max(paLenData$paLen)
+    groupedColor <- c()
+    for (x in levels(paLenData$apa)) {
+        groupedColor <- c(groupedColor, as.vector(unique(paLenData[paLenData$apa == x,]$color)))
+    }
+        
+    my_comparisons <- combn(as.vector(unique(paLenData$apa)), 2, simplify=F)
+    p1 <- ggplot(paLenData, aes(x=apa, y=paLen, label=paste0("n = ", count), fill=apa)) +
+        geom_violin() + geom_boxplot(width=0.1) + ggtitle(paste0("Violin plot in ", geneName)) + ylab("Poly(A) tail length") +
+        geom_text(y=maxPaLen*1.5, vjust=0, size=4, fontface="plain", color=labelColor) +
+        coord_cartesian(ylim=c(0,maxPaLen*1.5), clip="off") + theme_bw() +
+        theme(plot.margin=unit(c(2,0,0,1), "lines"), text = element_text(size=12, face="bold"),
+        plot.title = element_text(hjust = 0.5, vjust = 5), axis.title.x=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.border = element_blank(), axis.line = element_line(colour = "black"), legend.position = "none") +
+        scale_fill_manual(values = groupedColor) + 
+        stat_compare_means(test = "kruskal.test", comparisons = my_comparisons)
+    p2 <- ggplot(paLenData, aes(x=paLen, color=apa)) +
+        geom_density() + ggtitle(paste0("Density plot in ", geneName)) + ylab("Density (%)") + theme_bw() +
+        theme(plot.margin=unit(c(2,1,0,1), "lines"), text = element_text(size=12, face="bold"),
+        plot.title = element_text(hjust = 0.5, vjust = 5), axis.title.x=element_blank(),
+        panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.border = element_blank(), axis.line = element_line(colour = "black"), legend.title = element_blank(), legend.position = c(1, 1.05), legend.justification = c("right", "top"), legend.key.size = unit(0.3, 'cm')) +
+        scale_color_manual(values = groupedColor) + scale_y_continuous(labels = function(x) paste0(x*100))
+    pushViewport(viewport(layout = grid.layout(2, 2)))            
+    vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+    print(p1, vp=vplayout(2, 1))
+    print(p2, vp=vplayout(2, 2))
+    dev.off()
+}
+
+
 '''

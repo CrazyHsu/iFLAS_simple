@@ -284,23 +284,36 @@ class BedFile(object):
         self.bedFile = bedFile
         self.reads = self.getReadsInfo(type)
 
-    def getReadsInfo(self, type):
+    def getReadsInfo(self, bedType):
         readsDict = {}
         with open(self.bedFile) as f:
             for line in f:
-                if type == "bed12":
+                if bedType == "bed12":
                     b = Bed12(line)
                     readsDict.__setitem__(b.name, b)
-                elif type == "bed12+":
+                elif bedType == "bed12+":
                     b = Bed12Plus(line)
                     readsDict.__setitem__(b.name, b)
-                elif type == "bed6":
+                elif bedType == "bed6":
                     b = Bed6(line)
                     readsDict.__setitem__(b.name, b)
-                elif type == "bed6+":
+                elif bedType == "bed6+":
                     b = Bed6Plus(line)
                     readsDict.__setitem__(b.name, b)
         return readsDict
+
+    def getGenePos(self, bedType=None, geneCol=13):
+        genePos = {}
+        if bedType == "bed12+":
+            for r in self.reads:
+                gene = self.reads[r].otherList[geneCol - 13]
+                if gene not in genePos:
+                    genePos[gene] = [self.reads[r].chrom, self.reads[r].thickStart, self.reads[r].thickEnd]
+                else:
+                    if self.reads[r].thickStart < genePos[gene][1] or self.reads[r].thickEnd > genePos[gene][2]:
+                        genePos[gene] = [self.reads[r].chrom, self.reads[r].thickStart, self.reads[r].thickEnd]
+
+            return genePos
 
 
 class Gene2Reads(object):
