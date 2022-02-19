@@ -724,6 +724,22 @@ library(ggpubr)
 
 # refGtfDb <- makeTxDbFromGFF(refGtf, format = "gtf")
 # refGtfTrack <- GeneRegionTrack(refGtfDb, name="Gene model", transcriptAnnotation = "transcript", stackHeight = 0.5)
+
+getPlotHeight <- function(transNum){
+    results <- list()
+    trackSize <- 0.2
+    plotHeight <- 7
+    if(transNum>10 && transNum<70){
+        trackSize <- 0.2 + (transNum-10)*0.01
+    }else if(transNum>=70){
+        trackSize <- 0.7
+        plotHeight <- 7 + (transNum-70)*0.2
+    }
+    results$trackSize <- trackSize
+    results$plotHeight <- plotHeight
+    return(results)
+}
+
 plotPaTailApaStructure <- function(geneName, paSite, paLenList, countList, alignBam, chrom, chromStart, chromEnd) {
     options(ucscChromosomeNames=FALSE)
     # paSite <- "5_219996865;5_219996411;5_219996798;5_219996731"
@@ -764,13 +780,17 @@ plotPaTailApaStructure <- function(geneName, paSite, paLenList, countList, align
                                  fill="white", fontcolor.feature="black")
     
     outPdf <- checkFileExists(geneName, ".palenAndAPA.pdf", 0)
-    pdf(outPdf, useDingbats=FALSE)
+    regionGtfDb <- GeneRegionTrack(refGtfDb, chromosome=chrom, start=chromStart, end=chromEnd)
+    trans <- transcript(regionGtfDb)
+    plotHeight <- getPlotHeight(length(unique(trans)))
+    pdf(outPdf, useDingbats=FALSE, height=plotHeight$plotHeight)
     grid.newpage()
     pushViewport(viewport(layout = grid.layout(2, 1, heights=c(0.5,0.5))))
     pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+    mainTitle <- paste0("The poly(A) length related to APA in ", geneName)
     plotTracks(c(covTrack, bgTrack, annoTrack, refGtfTrack, gtrack), chromosome = chrom, from = chromStart, to = chromEnd, 
                  cex=0.5, fontsize=10, extend.left=0.15, extend.right=0.02, main=mainTitle, cex.main=1, 
-                 featureAnnotation = "id", sizes=c(0.1,0.05,0.05,0.2, 0.1), add=TRUE)
+                 featureAnnotation = "id", sizes=c(0.1,0.05,0.05,plotHeight$trackSize,0.1), add=TRUE)
     popViewport(1)
     
     

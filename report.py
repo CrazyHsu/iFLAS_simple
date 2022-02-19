@@ -9,7 +9,7 @@ Last modified: 2022-01-19
 import os
 
 import pandas as pd
-import PyPDF2, glob, itertools
+import PyPDF2, glob, itertools, shutil
 import warnings
 from commonFuncs import *
 from commonObjs import *
@@ -428,6 +428,8 @@ def reportPaTailAS(dataObj=None, refParams=None, dirSpec=None):
         palenAsFiles.append(sigFile)
 
     palenAsPlotsDir = os.path.join(os.getcwd(), "palenAsPlots")
+    if os.path.exists(palenAsPlotsDir):
+        shutil.rmtree(palenAsPlotsDir)
     resolveDir(palenAsPlotsDir)
     cmd = "cat {} | sort -u > palenAndAS.sig.bed12+".format(" ".join(palenAsFiles))
     subprocess.call(cmd, shell=True)
@@ -439,15 +441,18 @@ def reportPaTailAS(dataObj=None, refParams=None, dirSpec=None):
 
     ##########################
     palenApaPlotsDir = os.path.join(os.getcwd(), "palenApaPlots")
+    if os.path.exists(palenApaPlotsDir):
+        shutil.rmtree(palenApaPlotsDir)
     resolveDir(palenApaPlotsDir)
     makeTxDbGtfStr = '''
-        refGtfDb <- makeTxDbFromGFF(%s, format = "gtf")
+        options(ucscChromosomeNames=FALSE)
+        refGtfDb <- makeTxDbFromGFF("%s", format = "gtf")
         refGtfTrack <- GeneRegionTrack(refGtfDb, name="Gene model", transcriptAnnotation = "transcript", stackHeight = 0.5)
     ''' % (refParams.ref_gtf)
     robjects.r(makeTxDbGtfStr)
     readBedFile = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "refine", "reads.assigned.unambi.bed12+")
     palenApaFile = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "palenAS", "palenAPA", "apaRelatedPalen.txt")
-    alignBam = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "refine", "flnc.mm2.sorted.bam")
+    alignBam = os.path.join(dirSpec.out_dir, dataObj.project_name, dataObj.sample_name, "mapping", "flnc.mm2.sorted.bam")
     cmd = "samtools index {}".format(alignBam)
     subprocess.call(cmd, shell=True)
     genePosInfo = BedFile(readBedFile, type="bed12+").getGenePos(bedType="bed12+", geneCol=15)
@@ -469,7 +474,7 @@ def reportPaTailAS(dataObj=None, refParams=None, dirSpec=None):
     # robjects.r(plotAlleleAsStructureStr)
     pool = Pool(processes=dataObj.single_run_threads)
     for params in runParams:
-        pool.apply_async(robjects.r.plotAlleleApaStructure, (params[0], params[1], params[2], params[3], params[4],
+        pool.apply_async(robjects.r.plotPaTailApaStructure, (params[0], params[1], params[2], params[3], params[4],
                                                              params[5], params[6], params[7]))
     pool.close()
     pool.join()
